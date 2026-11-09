@@ -2,6 +2,9 @@
 
 Одностраничный статический сайт к персональной карте желаний Виктора.
 
+**Живая версия:** https://airdriverv-cloud.github.io/wish-map/
+**Репозиторий:** https://github.com/airdriverv-cloud/wish-map
+
 ## Локальный запуск
 
 ```powershell
