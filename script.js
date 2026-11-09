@@ -541,6 +541,7 @@
   function openModal(modal) {
     if (!modal) return;
     lastFocused = document.activeElement;
+    modal.hidden = false;
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('modal-open');
@@ -551,6 +552,9 @@
     if (!modal) return;
     modal.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
+    window.setTimeout(() => {
+      if (!modal.classList.contains('is-open')) modal.hidden = true;
+    }, 320);
     if (!$('.modal.is-open')) document.body.classList.remove('modal-open');
     if (modal === els.imageModal) imageWishId = null;
     state.editingId = null;
@@ -738,6 +742,7 @@
     lightboxIndex = Number(index) || 0;
     lastFocused = document.activeElement;
     renderLightbox();
+    if (lightbox) lightbox.hidden = false;
     lightbox?.classList.add('is-open');
     lightbox?.setAttribute('aria-hidden', 'false');
     document.body.classList.add('lightbox-open');
@@ -747,6 +752,9 @@
   function closeLightbox() {
     lightbox?.classList.remove('is-open');
     lightbox?.setAttribute('aria-hidden', 'true');
+    window.setTimeout(() => {
+      if (lightbox && !lightbox.classList.contains('is-open')) lightbox.hidden = true;
+    }, 320);
     document.body.classList.remove('lightbox-open');
     lastFocused?.focus?.();
   }

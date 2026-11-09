@@ -20,7 +20,8 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/CormorantGaramond-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="preload" href="assets/fonts/Manrope-Regular.ttf" as="font" type="font/ttf" crossorigin>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="app.css?v=1">
 <script>document.documentElement.classList.replace('no-js','js');</script>
 </head>
 <body>
@@ -443,7 +444,7 @@
   <button type="button" id="importShared">Забрать себе</button>
 </div>
 
-<div class="modal" id="wishModal" aria-hidden="true">
+<div class="modal" id="wishModal" aria-hidden="true" hidden>
   <div class="modal-backdrop" data-close-modal></div>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="wishModalTitle">
     <button class="modal-close" type="button" data-close-modal aria-label="Закрыть">×</button>
@@ -483,7 +484,7 @@
   </div>
 </div>
 
-<div class="modal" id="imageModal" aria-hidden="true">
+<div class="modal" id="imageModal" aria-hidden="true" hidden>
   <div class="modal-backdrop" data-close-modal></div>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="imageModalTitle">
     <button class="modal-close" type="button" data-close-modal aria-label="Закрыть">×</button>
@@ -519,7 +520,7 @@
   </div>
 </div>
 
-<div class="modal" id="shareModal" aria-hidden="true">
+<div class="modal" id="shareModal" aria-hidden="true" hidden>
   <div class="modal-backdrop" data-close-modal></div>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
     <button class="modal-close" type="button" data-close-modal aria-label="Закрыть">×</button>
@@ -541,7 +542,7 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
 
-<div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Просмотр карты">
+<div class="lightbox" id="lightbox" aria-hidden="true" hidden role="dialog" aria-modal="true" aria-label="Просмотр карты">
   <button class="lightbox-close" type="button" aria-label="Закрыть">×</button>
   <button class="lightbox-nav lightbox-prev" type="button" aria-label="Предыдущая сторона">←</button>
   <figure class="lightbox-figure">
