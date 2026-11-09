@@ -341,3 +341,7 @@ button.text-link:hover { border-color: var(--gold); }
   .video-tile-num { font-size: 14px; top: 8px; left: 8px; }
   .video-tile-fal { top: 7px; right: 7px; font-size: 5px; }
 }
+
+/* fallback for cached old JS: class .is-open should still show the dialog */
+.modal.is-open[hidden] { display: grid !important; visibility: visible !important; opacity: 1 !important; }
+.lightbox.is-open[hidden] { display: flex !important; visibility: visible !important; opacity: 1 !important; }
