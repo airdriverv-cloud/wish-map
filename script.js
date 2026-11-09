@@ -246,7 +246,15 @@
         ? `${state.wishes.length} ${plural(state.wishes.length, 'желание', 'желания', 'желаний')}`
         : `Показано ${visible.length} из ${state.wishes.length}`;
     }
+    renderRoute();
     updateProgress();
+  }
+
+  function renderRoute() {
+    $$('[data-route-id]').forEach((stop) => {
+      const wish = state.wishes.find((item) => item.id === stop.dataset.routeId);
+      stop.classList.toggle('is-done', Boolean(wish?.done));
+    });
   }
 
   function plural(number, one, few, many) {
@@ -655,7 +663,7 @@
     menuToggle?.setAttribute('aria-expanded', 'false');
   }));
 
-  const sectionIds = ['wishes', 'map', 'video', 'passport'];
+  const sectionIds = ['wishes', 'route', 'video-map', 'video', 'foundation', 'how'];
   const sections = sectionIds.map((id) => document.getElementById(id)).filter(Boolean);
   if ('IntersectionObserver' in window) {
     const navObserver = new IntersectionObserver((entries) => {
@@ -685,104 +693,10 @@
     revealItems.forEach((item) => item.classList.add('is-visible'));
   }
 
-  /* ---------- map viewer / lightbox ---------- */
-  const viewerImage = $('#viewer-image');
-  const viewerCaption = $('#viewer-caption');
-  const viewerStage = $('.viewer-stage');
-  const tabs = $$('.tab');
-  const views = [
-    { src: 'assets/img/front.jpg', caption: 'Лицевая сторона', alt: 'Лицевая сторона карты желаний' },
-    { src: 'assets/img/back.jpg', caption: 'Обратная сторона', alt: 'Обратная сторона — паспорт желаний' }
-  ];
-
-  function setView(index) {
-    const view = views[index];
-    if (viewerImage) {
-      viewerImage.src = view.src;
-      viewerImage.alt = view.alt;
-    }
-    if (viewerCaption) viewerCaption.textContent = view.caption;
-    if (viewerStage) viewerStage.dataset.lightbox = String(index);
-    tabs.forEach((tab, i) => {
-      const selected = i === index;
-      tab.classList.toggle('is-active', selected);
-      tab.setAttribute('aria-selected', String(selected));
-    });
-  }
-
-  tabs.forEach((tab, index) => {
-    tab.addEventListener('click', () => setView(index));
-    tab.addEventListener('keydown', (event) => {
-      if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
-      event.preventDefault();
-      const next = (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
-      tabs[next].focus();
-      setView(next);
-    });
-  });
-
-  const lightbox = $('#lightbox');
-  const lightboxImage = $('#lightbox-image');
-  const lightboxCaption = $('#lightbox-caption');
-  const closeButton = $('.lightbox-close');
-  const prevButton = $('.lightbox-prev');
-  const nextButton = $('.lightbox-next');
-  let lightboxIndex = 0;
-
-  function renderLightbox() {
-    const view = views[lightboxIndex];
-    if (lightboxImage) {
-      lightboxImage.src = view.src;
-      lightboxImage.alt = view.alt;
-    }
-    if (lightboxCaption) lightboxCaption.textContent = `${view.caption} · ${lightboxIndex + 1} / ${views.length}`;
-  }
-
-  function openLightbox(index) {
-    lightboxIndex = Number(index) || 0;
-    lastFocused = document.activeElement;
-    renderLightbox();
-    if (lightbox) lightbox.hidden = false;
-    lightbox?.classList.add('is-open');
-    lightbox?.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('lightbox-open');
-    window.setTimeout(() => closeButton?.focus(), 50);
-  }
-
-  function closeLightbox() {
-    lightbox?.classList.remove('is-open');
-    lightbox?.setAttribute('aria-hidden', 'true');
-    window.setTimeout(() => {
-      if (lightbox && !lightbox.classList.contains('is-open')) lightbox.hidden = true;
-    }, 320);
-    document.body.classList.remove('lightbox-open');
-    lastFocused?.focus?.();
-  }
-
-  function moveLightbox(direction) {
-    lightboxIndex = (lightboxIndex + direction + views.length) % views.length;
-    renderLightbox();
-  }
-
-  $$('[data-lightbox]').forEach((trigger) => {
-    trigger.addEventListener('click', () => openLightbox(trigger.dataset.lightbox));
-  });
-  closeButton?.addEventListener('click', closeLightbox);
-  prevButton?.addEventListener('click', () => moveLightbox(-1));
-  nextButton?.addEventListener('click', () => moveLightbox(1));
-  lightbox?.addEventListener('click', (event) => {
-    if (event.target === lightbox) closeLightbox();
-  });
-
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-      closeLightbox();
-      closeModal($('.modal.is-open'));
-      document.body.classList.remove('nav-open');
-    }
-    if (!lightbox?.classList.contains('is-open')) return;
-    if (event.key === 'ArrowLeft') moveLightbox(-1);
-    if (event.key === 'ArrowRight') moveLightbox(1);
+    if (event.key !== 'Escape') return;
+    closeModal($('.modal.is-open'));
+    document.body.classList.remove('nav-open');
   });
 
   /* ---------- video ---------- */
@@ -877,5 +791,4 @@
   }
   renderWishes();
   setFilter('all');
-  setView(0);
 })();

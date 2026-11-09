@@ -20,8 +20,8 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/CormorantGaramond-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="preload" href="assets/fonts/Manrope-Regular.ttf" as="font" type="font/ttf" crossorigin>
-<link rel="stylesheet" href="style.css?v=3">
-<link rel="stylesheet" href="app.css?v=1">
+<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="app.css?v=3">
 <script>document.documentElement.classList.replace('no-js','js');</script>
 </head>
 <body>
@@ -35,9 +35,9 @@
     </a>
     <nav class="nav" id="nav" aria-label="Основная навигация">
       <a href="#wishes">Желания</a>
-      <a href="#map">Карта</a>
+      <a href="#route">Маршрут</a>
       <a href="#video-map">Видео</a>
-      <a href="#passport">Паспорт</a>
+      <a href="#how">Как это работает</a>
     </nav>
     <div class="header-actions">
       <button class="btn btn-small btn-share" id="shareTop" type="button">
@@ -70,13 +70,27 @@
       </div>
 
       <div class="hero-art reveal">
-        <div class="map-frame" data-tilt>
-          <img src="assets/img/front-sm.jpg" width="900" height="1273" alt="Лицевая сторона карты желаний Виктора" fetchpriority="high">
-          <span class="map-frame-label">01 / Лицевая</span>
+        <div class="wish-deck" aria-label="Три желания из живой карты">
+          <article class="deck-card deck-card-a">
+            <img src="assets/img/card-01.jpg" width="640" height="800" alt="Домбай" fetchpriority="high">
+            <span class="deck-month">Февраль</span>
+            <h3>Домбай</h3>
+          </article>
+          <article class="deck-card deck-card-b">
+            <img src="assets/img/card-07.jpg" width="640" height="800" alt="Яхты и кайты" loading="lazy">
+            <span class="deck-month">Лето</span>
+            <h3>Яхты</h3>
+          </article>
+          <article class="deck-card deck-card-c">
+            <img src="assets/img/love.jpg" width="640" height="800" alt="Светлана" loading="lazy">
+            <span class="deck-month">Всегда</span>
+            <h3>Светлана</h3>
+          </article>
+          <span class="deck-count"><b>10</b> желаний</span>
         </div>
         <div class="hero-note">
           <span class="hero-note-star" aria-hidden="true">✦</span>
-          <p><b>Светлана</b><br>всегда рядом</p>
+          <p><b>Живая,</b><br>не распечатанная</p>
         </div>
       </div>
     </div>
@@ -137,53 +151,54 @@
     </div>
   </section>
 
-  <section class="section" id="map">
+  <section class="section route-section" id="route">
     <div class="container">
       <div class="section-head">
         <div>
-          <p class="eyebrow reveal">02 / Карта</p>
-          <h2 class="reveal">Одна жизнь.<br><em>Один маршрут.</em></h2>
+          <p class="eyebrow reveal">02 / Маршрут</p>
+          <h2 class="reveal">Год, разложенный<br><em>по месяцам.</em></h2>
         </div>
-        <p class="section-note reveal">Та же карта — в большом формате. Лицевая сторона для настроения, обратная — для дат, бюджета и первого шага.</p>
+        <p class="section-note reveal">Не сетка из картинок, а маршрут: когда, куда и что должно случиться. Отмечай желание — остановка загорается.</p>
       </div>
 
-      <div class="viewer">
-        <div class="viewer-main reveal">
-          <div class="viewer-toolbar">
-            <div class="tabs" role="tablist" aria-label="Сторона карты">
-              <button class="tab is-active" type="button" role="tab" aria-selected="true" data-view="front">Лицевая</button>
-              <button class="tab" type="button" role="tab" aria-selected="false" data-view="back">Обратная</button>
-            </div>
-            <span class="viewer-hint">Нажми, чтобы увеличить</span>
-          </div>
-          <button class="viewer-stage" type="button" data-lightbox="0" aria-label="Открыть карту в полном размере">
-            <img id="viewer-image" src="assets/img/front.jpg" width="1600" height="2263" alt="Лицевая сторона карты желаний">
-          </button>
-          <div class="viewer-caption">
-            <span id="viewer-caption">Лицевая сторона</span>
-            <span>2480 × 3508 · 300 dpi</span>
-          </div>
-        </div>
+      <div class="route-track reveal">
+        <article class="route-stop" data-route-id="dombay">
+          <div class="route-image"><img src="assets/img/scenes/scene-ski.jpg" alt="Домбай" loading="lazy"><span class="route-check" aria-hidden="true">✓</span></div>
+          <div class="route-copy"><span class="route-month">Февраль</span><h3>Домбай</h3><p>горные лыжи</p></div>
+        </article>
+        <article class="route-stop" data-route-id="egypt">
+          <div class="route-image"><img src="assets/img/scenes/scene-egypt.jpg" alt="Египет" loading="lazy"><span class="route-check" aria-hidden="true">✓</span></div>
+          <div class="route-copy"><span class="route-month">Март — май</span><h3>Египет</h3><p>Красное море</p></div>
+        </article>
+        <article class="route-stop" data-route-id="pyatigorsk">
+          <div class="route-image"><img src="assets/img/scenes/scene-pyatigorsk.jpg" alt="Пятигорск" loading="lazy"><span class="route-check" aria-hidden="true">✓</span></div>
+          <div class="route-copy"><span class="route-month">Май — июль</span><h3>Пятигорск</h3><p>парапланы</p></div>
+        </article>
+        <article class="route-stop" data-route-id="dolzhanka">
+          <div class="route-image"><img src="assets/img/scenes/scene-dolzhanka.jpg" alt="Должанка" loading="lazy"><span class="route-check" aria-hidden="true">✓</span></div>
+          <div class="route-copy"><span class="route-month">Лето</span><h3>Должанка</h3><p>кайт каждый день</p></div>
+        </article>
+        <article class="route-stop" data-route-id="turkey">
+          <div class="route-image"><img src="assets/img/scenes/scene-turkey.jpg" alt="Турция" loading="lazy"><span class="route-check" aria-hidden="true">✓</span></div>
+          <div class="route-copy"><span class="route-month">Август — сентябрь</span><h3>Турция</h3><p>параглайдинг</p></div>
+        </article>
+        <article class="route-stop" data-route-id="vietnam">
+          <div class="route-image"><img src="assets/img/scenes/scene-vietnam.jpg" alt="Вьетнам" loading="lazy"><span class="route-check" aria-hidden="true">✓</span></div>
+          <div class="route-copy"><span class="route-month">Сентябрь — декабрь</span><h3>Вьетнам</h3><p>жизнь у океана</p></div>
+        </article>
+        <article class="route-stop" data-route-id="yacht">
+          <div class="route-image"><img src="assets/img/scenes/scene-yacht.jpg" alt="Яхты" loading="lazy"><span class="route-check" aria-hidden="true">✓</span></div>
+          <div class="route-copy"><span class="route-month">В путешествиях</span><h3>Яхты</h3><p>вместе по морям</p></div>
+        </article>
+        <article class="route-stop" data-route-id="business">
+          <div class="route-image"><img src="assets/img/scenes/scene-business.jpg" alt="Бизнес" loading="lazy"><span class="route-check" aria-hidden="true">✓</span></div>
+          <div class="route-copy"><span class="route-month">Весь год</span><h3>Бизнес</h3><p>без ручного управления</p></div>
+        </article>
+      </div>
 
-        <aside class="viewer-aside reveal">
-          <div class="fact">
-            <span class="fact-num">01</span>
-            <div><small>Доход</small><strong>свыше 1 000 000 ₽ / мес</strong></div>
-          </div>
-          <div class="fact">
-            <span class="fact-num">02</span>
-            <div><small>Рядом</small><strong>Светлана — моя девушка</strong></div>
-          </div>
-          <div class="fact">
-            <span class="fact-num">03</span>
-            <div><small>География</small><strong>8 направлений в году</strong></div>
-          </div>
-          <div class="aside-actions">
-            <a class="btn" href="assets/karta-zhelaniy-viktor.pdf" download>Скачать PDF</a>
-            <button class="text-link" type="button" data-lightbox="0">Открыть полностью <span aria-hidden="true">↗</span></button>
-          </div>
-          <p class="micro">Бюджеты в паспорте оставлены пустыми — чтобы вписать реальные цифры.</p>
-        </aside>
+      <div class="route-foot reveal">
+        <span>8 остановок · 12 месяцев</span>
+        <span>Отметки синхронизированы с карточками выше</span>
       </div>
     </div>
   </section>
@@ -374,27 +389,37 @@
     </div>
   </section>
 
-  <section class="section passport" id="passport">
-    <div class="container passport-grid">
-      <div class="passport-copy">
-        <p class="eyebrow reveal">06 / Паспорт</p>
-        <h2 class="reveal">Красивая карта —<br><em>только половина.</em></h2>
-        <p class="lead-small reveal">На обратной стороне — 10 строк: когда, ресурсы, бюджет и первый шаг. Бюджеты оставлены пустыми, чтобы вписать реальные цифры.</p>
-        <ul class="checklist reveal">
-          <li>10 целей с датами и первым шагом</li>
-          <li>поля для бюджета каждой поездки</li>
-          <li>ритуал месяца и трекер 12 месяцев</li>
-        </ul>
-        <div class="hero-actions reveal">
-          <a class="btn" href="assets/karta-zhelaniy-viktor.pdf" download>Скачать PDF</a>
-          <button class="btn btn-ghost" type="button" data-lightbox="1">Открыть паспорт</button>
+  <section class="section how-section" id="how">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow reveal">06 / Как это работает</p>
+          <h2 class="reveal">Три шага.<br><em>Без пустого холста.</em></h2>
         </div>
+        <p class="section-note reveal">Не нужно собирать коллаж в редакторе и печатать. Напиши желание — сайт сам разложит его по маршруту.</p>
       </div>
-      <div class="passport-art reveal">
-        <button class="paper-frame" type="button" data-lightbox="1" aria-label="Открыть паспорт желаний">
-          <img src="assets/img/back-sm.jpg" width="900" height="1273" loading="lazy" alt="Обратная сторона карты — паспорт желаний">
-          <span class="paper-tag">02 / Обратная</span>
-        </button>
+
+      <div class="how-grid">
+        <article class="how-card reveal">
+          <span>01</span>
+          <h3>Напиши</h3>
+          <p>Одной строкой: куда, когда и с кем. Без идеальных формулировок.</p>
+        </article>
+        <article class="how-card reveal">
+          <span>02</span>
+          <h3>Собери</h3>
+          <p>Карточка получает месяц, категорию и место в маршруте года.</p>
+        </article>
+        <article class="how-card reveal">
+          <span>03</span>
+          <h3>Живи</h3>
+          <p>Отмечай сбывшееся, меняй детали, делись ссылкой с близкими.</p>
+        </article>
+      </div>
+
+      <div class="how-cta reveal">
+        <button class="btn" type="button" data-add-wish><span aria-hidden="true">+</span> Добавить первое желание</button>
+        <span>Уже 10 — для примера. Твои будут рядом.</span>
       </div>
     </div>
   </section>
@@ -421,7 +446,7 @@
       <p class="manifesto-text reveal">Я не жду жизнь.<br><em>Я её строю.</em></p>
       <p class="manifesto-sub reveal">Первый шаг — поставить даты в календарь.</p>
       <div class="hero-actions reveal">
-        <a class="btn" href="assets/karta-zhelaniy-viktor.pdf" download>Забрать карту в PDF</a>
+        <button class="btn" type="button" data-add-wish>Добавить желание</button>
         <button class="btn btn-ghost" type="button" id="shareManifesto">Поделиться картой</button>
       </div>
     </div>
@@ -542,16 +567,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
 
-<div class="lightbox" id="lightbox" aria-hidden="true" hidden role="dialog" aria-modal="true" aria-label="Просмотр карты">
-  <button class="lightbox-close" type="button" aria-label="Закрыть">×</button>
-  <button class="lightbox-nav lightbox-prev" type="button" aria-label="Предыдущая сторона">←</button>
-  <figure class="lightbox-figure">
-    <img id="lightbox-image" src="assets/img/front.jpg" alt="">
-    <figcaption id="lightbox-caption">Лицевая сторона</figcaption>
-  </figure>
-  <button class="lightbox-nav lightbox-next" type="button" aria-label="Следующая сторона">→</button>
-</div>
-
-<script src="script.js?v=4" defer></script>
+<script src="script.js?v=5" defer></script>
 </body>
 </html>
