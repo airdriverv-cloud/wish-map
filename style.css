@@ -1364,3 +1364,5 @@ button.text-link:hover { border-color: var(--gold); }
   .video-grid .video-play b { font-size: 22px; }
   .video-grid .video-play-icon { width: 46px; height: 46px; font-size: 13px; }
 }
+
+.video-play b, .video-play small { text-shadow: 0 2px 14px rgba(0, 0, 0, 0.72); }
