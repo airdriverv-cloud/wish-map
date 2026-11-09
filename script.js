@@ -795,6 +795,22 @@
     video?.addEventListener('play', () => shell.classList.add('is-playing'));
   });
 
+  /* ---------- FAL video wall ---------- */
+  const wallVideos = $$('.video-tile video');
+  if (wallVideos.length && 'IntersectionObserver' in window && !reduceMotion.matches) {
+    const wallObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const video = entry.target;
+        if (entry.isIntersecting) {
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      });
+    }, { rootMargin: '80px 0px', threshold: 0.15 });
+    wallVideos.forEach((video) => wallObserver.observe(video));
+  }
+
   /* ---------- bindings ---------- */
   els.grid?.addEventListener('click', (event) => {
     const replace = event.target.closest('[data-replace]');
