@@ -97,10 +97,7 @@
     imageDetails: $('#imageDetails'),
     sendImageRequest: $('#sendImageRequest'),
     copyImageRequest: $('#copyImageRequest'),
-    toast: $('#toast'),
-    video: $('#wishVideo'),
-    videoShell: $('#videoShell'),
-    videoPlay: $('#videoPlay')
+    toast: $('#toast')
   };
 
   const uid = () => `wish-${Date.now()}-${Math.random().toString(16).slice(2, 6)}`;
@@ -781,17 +778,22 @@
   });
 
   /* ---------- video ---------- */
-  els.videoPlay?.addEventListener('click', async () => {
-    if (!els.video) return;
-    els.videoShell?.classList.add('is-playing');
-    try {
-      await els.video.play();
-    } catch {
-      els.videoShell?.classList.remove('is-playing');
-      showToast('Нажми Play в плеере видео');
-    }
+  $$('.video-shell').forEach((shell) => {
+    const video = shell.querySelector('video');
+    const play = shell.querySelector('.video-play');
+    play?.addEventListener('click', async () => {
+      if (!video) return;
+      video.controls = true;
+      shell.classList.add('is-playing');
+      try {
+        await video.play();
+      } catch {
+        shell.classList.remove('is-playing');
+        showToast('Нажми Play в плеере видео');
+      }
+    });
+    video?.addEventListener('play', () => shell.classList.add('is-playing'));
   });
-  els.video?.addEventListener('play', () => els.videoShell?.classList.add('is-playing'));
 
   /* ---------- bindings ---------- */
   els.grid?.addEventListener('click', (event) => {

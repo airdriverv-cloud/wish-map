@@ -1335,3 +1335,32 @@ button.text-link:hover { border-color: var(--gold); }
   .image-mode b { font-size: 21px; }
   .image-mode small { font-size: 7px; letter-spacing: 0.05em; }
 }
+
+/* two video cards */
+.video-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.video-card { min-width: 0; }
+.video-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.video-label span:first-child { color: var(--gold-light); }
+.video-grid .video-play b { font-size: 28px; }
+.video-grid .video-play-icon { width: 56px; height: 56px; font-size: 15px; }
+.video-caption { margin: 11px 0 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+.video-meta .text-link { margin-left: 0; }
+.video-meta { row-gap: 10px; }
+@media (max-width: 900px) {
+  .video-grid { grid-template-columns: 1fr; gap: 30px; }
+  .video-label { margin-bottom: 8px; }
+}
+@media (max-width: 620px) {
+  .video-grid .video-play b { font-size: 22px; }
+  .video-grid .video-play-icon { width: 46px; height: 46px; font-size: 13px; }
+}
