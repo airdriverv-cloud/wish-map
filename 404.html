@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Страница не найдена — Карта желаний</title>
+<style>
+  @font-face { font-family: "Cormorant"; src: url("/wish-map/assets/fonts/CormorantGaramond-Regular.ttf") format("truetype"); font-weight: 300 700; font-display: swap; }
+  @font-face { font-family: "Manrope"; src: url("/wish-map/assets/fonts/Manrope-Regular.ttf") format("truetype"); font-weight: 200 800; font-display: swap; }
+  :root { --bg:#0b1c18; --cream:#f4ebdc; --gold:#c9a063; --sand:#d8c5a8; --muted:#9aa394; }
+  * { box-sizing:border-box; }
+  body { margin:0; min-height:100svh; display:grid; place-items:center; background:radial-gradient(700px 500px at 70% 20%, rgba(194,106,73,.14), transparent 65%), var(--bg); color:var(--cream); font-family:"Manrope", system-ui, sans-serif; }
+  .wrap { width:min(680px, calc(100% - 40px)); text-align:center; padding:60px 0; }
+  .mark { width:56px; height:56px; margin:0 auto 40px; display:grid; place-items:center; border:1px solid var(--gold); border-radius:50%; color:var(--gold); font-family:"Cormorant", Georgia, serif; font-size:26px; }
+  .eyebrow { margin:0 0 18px; color:var(--gold); font-size:10px; letter-spacing:.3em; text-transform:uppercase; }
+  h1 { margin:0; font-family:"Cormorant", Georgia, serif; font-weight:500; font-size:clamp(60px, 12vw, 110px); line-height:.9; letter-spacing:-.03em; }
+  p { color:var(--muted); font-size:14px; line-height:1.7; margin:26px auto 0; max-width:430px; }
+  a { display:inline-flex; margin-top:32px; padding:14px 24px; border:1px solid var(--gold); border-radius:999px; color:var(--cream); text-decoration:none; font-size:10px; letter-spacing:.16em; text-transform:uppercase; transition:background .25s, color .25s; }
+  a:hover { background:var(--gold); color:var(--bg); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="mark">V</div>
+    <p class="eyebrow">404 · Не туда</p>
+    <h1>Эта дорога<br>не на карте.</h1>
+    <p>Страница не найдена. Вернись к карте желаний — там всё, что нужно.</p>
+    <a href="/wish-map/">Вернуться на карту</a>
+  </div>
+</body>
+</html>
