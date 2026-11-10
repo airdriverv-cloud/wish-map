@@ -6,6 +6,7 @@
   const STORAGE_KEY = 'wishmap-viktor-v2';
   const IMAGE_DRAFT_KEY = 'wishmap-image-drafts-v1';
   const COLLAGE_KEY = 'wishmap-collage-layout-v1';
+  const COLLAGE_SAVED_KEY = 'wishmap-collage-saved-v1';
   const CARD_IMAGES = {
     dombay: 'assets/img/card-01.jpg',
     egypt: 'assets/img/card-02.jpg',
@@ -53,6 +54,8 @@
   let deleteTimer = null;
   let draftTimer = null;
   let restoringDraft = false;
+  let importArmed = false;
+  let importTimer = null;
   let imageMethod = 'find';
   let imageStyle = 'cartoon';
   const FAL_PIN = '6620';
@@ -190,7 +193,7 @@
       const parsed = JSON.parse(raw);
       if (!Array.isArray(parsed?.wishes)) return seedWishes();
       const wishes = parsed.wishes.map(normalizeWish).filter(Boolean);
-      return wishes.length ? wishes : seedWishes();
+      return wishes;
     } catch {
       return seedWishes();
     }
@@ -220,11 +223,23 @@
     return new TextDecoder().decode(bytes);
   }
 
+  function shareableImage(image) {
+    return typeof image === 'string' && (/^https?:\/\//.test(image) || /^assets\//.test(image));
+  }
+
   function buildShareUrl() {
     const payload = {
       v: 1,
       name: 'Виктор + Светлана',
-      wishes: state.wishes.map(({ id, title, note, month, category, done }) => ({ id, title, note, month, category, done }))
+      wishes: state.wishes.map((wish) => ({
+        id: wish.id,
+        title: wish.title,
+        note: wish.note,
+        month: wish.month,
+        category: wish.category,
+        done: wish.done,
+        image: shareableImage(wish.image) ? wish.image : ''
+      }))
     };
     return `${location.origin}${location.pathname}?share=${toBase64Url(JSON.stringify(payload))}`;
   }
@@ -296,41 +311,73 @@
         : `Показано ${visible.length} из ${state.wishes.length}`;
     }
     renderRoute();
+    renderHero();
     renderCollage();
     updateProgress();
   }
 
   function renderRoute() {
-    $$('[data-route-id]').forEach((stop) => {
-      const wish = state.wishes.find((item) => item.id === stop.dataset.routeId);
-      stop.classList.toggle('is-done', Boolean(wish?.done));
+    const track = $('#routeTrack');
+    if (!track) return;
+    track.innerHTML = state.wishes.map((wish) => `
+      <article class="route-stop${wish.done ? ' is-done' : ''}" data-route-id="${escapeHtml(wish.id)}">
+        <div class="route-image">
+          ${wish.image ? `<img src="${escapeHtml(wish.image)}" alt="${escapeHtml(wish.title)}" loading="lazy">` : ''}
+          <span class="route-check" aria-hidden="true">✓</span>
+        </div>
+        <div class="route-copy">
+          <span class="route-month">${escapeHtml(wish.month || 'когда угодно')}</span>
+          <h3>${escapeHtml(wish.title)}</h3>
+          <p>${escapeHtml(wish.note || CATEGORY_LABEL[wish.category] || 'мечта')}</p>
+        </div>
+      </article>`).join('');
+    const count = $('#routeCount');
+    if (count) {
+      const n = state.wishes.length;
+      count.textContent = `${n} ${plural(n, 'остановка', 'остановки', 'остановок')} · 12 месяцев`;
+    }
+  }
+
+  function renderHero() {
+    const preferred = ['dombay', 'yacht', 'love'];
+    const picks = [];
+    preferred.forEach((id) => {
+      const wish = state.wishes.find((item) => item.id === id);
+      if (wish) picks.push(wish);
     });
+    state.wishes.forEach((wish) => {
+      if (picks.length < 3 && !picks.includes(wish)) picks.push(wish);
+    });
+    picks.slice(0, 3).forEach((wish, index) => {
+      const number = index + 1;
+      const image = $(`#deckImg${number}`);
+      const month = $(`#deckMonth${number}`);
+      const title = $(`#deckTitle${number}`);
+      if (image) {
+        image.src = wish.image || 'assets/img/card-01.jpg';
+        image.alt = wish.title;
+      }
+      if (month) month.textContent = wish.month || 'когда угодно';
+      if (title) title.textContent = wish.title;
+    });
+    const count = state.wishes.length;
+    const categories = new Set(state.wishes.map((wish) => wish.category)).size;
+    if ($('#deckCount')) $('#deckCount').textContent = String(count);
+    if ($('#heroWishCount')) $('#heroWishCount').textContent = String(count);
+    if ($('#heroCategoryCount')) $('#heroCategoryCount').textContent = String(categories);
+    if ($('#heroCategoryLabel')) $('#heroCategoryLabel').textContent = plural(categories, 'категория', 'категории', 'категорий');
+    if ($('#heroLead')) {
+      $('#heroLead').textContent = `${count} ${plural(count, 'желание', 'желания', 'желаний')}, ${categories} ${plural(categories, 'категория', 'категории', 'категорий')} и 12 месяцев.`;
+    }
   }
 
   function renderCollage() {
-    const board = $('#collageBoard');
-    if (!board) return;
-    board.className = `collage-board is-${collageLayout}`;
-    board.innerHTML = state.wishes.slice(0, 10).map((wish, index) => {
-      const media = wish.image
-        ? `<img src="${escapeHtml(wish.image)}" alt="${escapeHtml(wish.title)}" loading="lazy">`
-        : '<span class="collage-placeholder" aria-hidden="true"></span>';
-      return `
-        <article class="collage-item${wish.image ? '' : ' no-image'}">
-          ${media}
-          <div class="collage-caption">
-            <span>${String(index + 1).padStart(2, '0')} · ${escapeHtml(CATEGORY_LABEL[wish.category] || 'Мечта')}</span>
-            <b>${escapeHtml(wish.title)}</b>
-            <small>${escapeHtml(wish.month || 'когда угодно')}</small>
-          </div>
-        </article>`;
-    }).join('');
-    const name = $('#collageName');
-    if (name) name.textContent = COLLAGE_LAYOUTS[collageLayout].label;
-    $$('.collage-tab, .collage-quick-tab').forEach((button) => {
+    if (!els.grid) return;
+    els.grid.classList.remove('is-mosaic', 'is-grid', 'is-polaroid');
+    els.grid.classList.add(`is-${collageLayout}`);
+    $$('.collage-quick-tab').forEach((button) => {
       const active = button.dataset.collageLayout === collageLayout;
       button.classList.toggle('is-active', active);
-      button.setAttribute('aria-selected', String(active));
       button.setAttribute('aria-pressed', String(active));
     });
   }
@@ -339,7 +386,7 @@
     if (!COLLAGE_LAYOUTS[layout]) return;
     collageLayout = layout;
     try { localStorage.setItem(COLLAGE_KEY, layout); } catch {}
-    renderCollage();
+    renderWishes();
     showToast(`Коллаж: ${COLLAGE_LAYOUTS[layout].label}`);
   }
 
@@ -925,17 +972,35 @@
 
   function importShared() {
     if (!state.shared) return;
+    let existing = null;
+    try { existing = localStorage.getItem(STORAGE_KEY); } catch {}
+    if (existing && !importArmed) {
+      importArmed = true;
+      if (els.importShared) els.importShared.textContent = 'Заменить мою карту?';
+      if (importTimer) window.clearTimeout(importTimer);
+      importTimer = window.setTimeout(() => {
+        importArmed = false;
+        if (els.importShared) els.importShared.textContent = 'Забрать себе';
+      }, 4000);
+      showToast('Нажми ещё раз, чтобы заменить свою карту');
+      return;
+    }
+    if (importTimer) window.clearTimeout(importTimer);
     try {
+      if (existing) localStorage.setItem('wishmap-viktor-backup', existing);
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ wishes: state.wishes, updatedAt: Date.now() }));
     } catch {
-      // всё равно даём пользоваться в этой вкладке
+      showToast('Не удалось сохранить карту в браузере');
+      return;
     }
+    importArmed = false;
+    if (els.importShared) els.importShared.textContent = 'Забрать себе';
     state.shared = false;
     document.body.classList.remove('is-shared');
     if (els.shareBanner) els.shareBanner.hidden = true;
     history.replaceState({}, '', location.pathname);
     renderWishes();
-    showToast('Карта сохранена. Теперь можно отмечать');
+    showToast(existing ? 'Карта заменена. Старая копия сохранена' : 'Карта сохранена. Теперь можно отмечать');
   }
 
   /* ---------- modals ---------- */
@@ -1056,7 +1121,7 @@
     menuToggle?.setAttribute('aria-expanded', 'false');
   }));
 
-  const sectionIds = ['wishes', 'route', 'collage', 'video-map', 'video', 'foundation', 'how'];
+  const sectionIds = ['wishes', 'route', 'video-map', 'video', 'foundation', 'how'];
   const sections = sectionIds.map((id) => document.getElementById(id)).filter(Boolean);
   if ('IntersectionObserver' in window) {
     const navObserver = new IntersectionObserver((entries) => {
@@ -1087,9 +1152,25 @@
   }
 
   document.addEventListener('keydown', (event) => {
-    if (event.key !== 'Escape') return;
-    closeModal($('.modal.is-open'));
-    document.body.classList.remove('nav-open');
+    const modal = $('.modal.is-open');
+    if (event.key === 'Escape') {
+      closeModal(modal);
+      document.body.classList.remove('nav-open');
+      return;
+    }
+    if (event.key !== 'Tab' || !modal) return;
+    const focusable = $$('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])', modal)
+      .filter((item) => item.offsetParent !== null);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && (document.activeElement === first || !modal.contains(document.activeElement))) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && (document.activeElement === last || !modal.contains(document.activeElement))) {
+      event.preventDefault();
+      first.focus();
+    }
   });
 
   /* ---------- video ---------- */
@@ -1184,11 +1265,25 @@
   $$('.collage-tab, .collage-quick-tab').forEach((button) => {
     button.addEventListener('click', () => setCollageLayout(button.dataset.collageLayout));
   });
-  $('#saveCollage')?.addEventListener('click', () => {
-    try { localStorage.setItem(COLLAGE_KEY, collageLayout); } catch {}
-    showToast('Коллаж сохранён');
+  $('#saveCollageView')?.addEventListener('click', () => {
+    try {
+      localStorage.setItem(COLLAGE_KEY, collageLayout);
+      localStorage.setItem(COLLAGE_SAVED_KEY, JSON.stringify({ layout: collageLayout, savedAt: Date.now() }));
+    } catch {
+      showToast('Не удалось сохранить вид');
+      return;
+    }
+    const button = $('#saveCollageView');
+    if (button) {
+      button.textContent = 'Вид сохранён';
+      button.classList.add('is-saved');
+      window.setTimeout(() => {
+        button.textContent = 'Сохранить вид';
+        button.classList.remove('is-saved');
+      }, 2200);
+    }
+    showToast(`Сохранён вид: ${COLLAGE_LAYOUTS[collageLayout].label}`);
   });
-
   els.imagePrompt?.addEventListener('input', saveImageDraft);
   els.imageDetails?.addEventListener('input', saveImageDraft);
   els.generateImage?.addEventListener('click', generateImage);

@@ -21,7 +21,7 @@
 <link rel="preload" href="assets/fonts/CormorantGaramond-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/Manrope-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css?v=23">
-<link rel="stylesheet" href="app.css?v=24">
+<link rel="stylesheet" href="app.css?v=28">
 <script>document.documentElement.classList.replace('no-js','js');</script>
 </head>
 <body>
@@ -36,7 +36,6 @@
     <nav class="nav" id="nav" aria-label="Основная навигация">
       <a href="#wishes">Желания</a>
       <a href="#route">Маршрут</a>
-      <a href="#collage">Коллаж</a>
       <a href="#video-map">Видео</a>
       <a href="#how">Как это работает</a>
     </nav>
@@ -58,14 +57,14 @@
       <div class="hero-copy">
         <p class="eyebrow reveal">Личная карта желаний</p>
         <h1 class="reveal">Жизнь,<br>которую я<br><em>строю сам.</em></h1>
-        <p class="lead reveal">Виктор Павлович. 10 целей, 8 направлений и 12 месяцев. Отмечай сбывшееся, добавляй новое и делись картой.</p>
+        <p class="lead reveal">Виктор Павлович. <span id="heroLead">10 желаний, 4 категории и 12 месяцев.</span> Отмечай сбывшееся, добавляй новое и делись картой.</p>
         <div class="hero-actions reveal">
           <a class="btn" href="#wishes">Мои желания</a>
           <a class="btn btn-ghost" href="#video-map"><span class="play-glyph" aria-hidden="true">▶</span> Смотреть видео</a>
         </div>
         <div class="hero-stats reveal" aria-label="Коротко о карте">
-          <span><b>10</b> целей</span>
-          <span><b>8</b> направлений</span>
+          <span><b id="heroWishCount">10</b> желаний</span>
+          <span><b id="heroCategoryCount">4</b> <span id="heroCategoryLabel">категории</span></span>
           <span><b>12</b> месяцев</span>
         </div>
       </div>
@@ -73,21 +72,21 @@
       <div class="hero-art reveal">
         <div class="wish-deck" aria-label="Три желания из живой карты">
           <article class="deck-card deck-card-a">
-            <img src="assets/img/card-01.jpg" width="640" height="800" alt="Домбай" fetchpriority="high">
-            <span class="deck-month">Февраль</span>
-            <h3>Домбай</h3>
+            <img id="deckImg1" src="assets/img/card-01.jpg" width="640" height="800" alt="Домбай" fetchpriority="high">
+            <span class="deck-month" id="deckMonth1">Февраль</span>
+            <h3 id="deckTitle1">Домбай</h3>
           </article>
           <article class="deck-card deck-card-b">
-            <img src="assets/img/card-07.jpg" width="640" height="800" alt="Яхты и кайты" loading="lazy">
-            <span class="deck-month">Лето</span>
-            <h3>Яхты</h3>
+            <img id="deckImg2" src="assets/img/card-07.jpg" width="640" height="800" alt="Яхты и кайты" loading="lazy">
+            <span class="deck-month" id="deckMonth2">Лето</span>
+            <h3 id="deckTitle2">Яхты</h3>
           </article>
           <article class="deck-card deck-card-c">
-            <img src="assets/img/love.jpg" width="640" height="800" alt="Светлана" loading="lazy">
-            <span class="deck-month">Всегда</span>
-            <h3>Светлана</h3>
+            <img id="deckImg3" src="assets/img/love.jpg" width="640" height="800" alt="Светлана" loading="lazy">
+            <span class="deck-month" id="deckMonth3">Всегда</span>
+            <h3 id="deckTitle3">Светлана</h3>
           </article>
-          <span class="deck-count"><b>10</b> желаний</span>
+          <span class="deck-count"><b id="deckCount">10</b> желаний</span>
         </div>
         <div class="hero-note">
           <span class="hero-note-star" aria-hidden="true">✦</span>
@@ -147,7 +146,7 @@
         <button class="collage-quick-tab is-active" type="button" data-collage-layout="mosaic" aria-pressed="true">Классика</button>
         <button class="collage-quick-tab" type="button" data-collage-layout="grid" aria-pressed="false">Сетка</button>
         <button class="collage-quick-tab" type="button" data-collage-layout="polaroid" aria-pressed="false">Полароиды</button>
-        <a class="collage-quick-link" href="#collage">открыть <span aria-hidden="true">↗</span></a>
+        <button class="collage-save" id="saveCollageView" type="button">Сохранить вид</button>
       </div>
 
       <div class="wish-grid" id="wishGrid" aria-live="polite"></div>
@@ -170,71 +169,11 @@
         <p class="section-note reveal">Не сетка из картинок, а маршрут: когда, куда и что должно случиться. Отмечай желание — остановка загорается.</p>
       </div>
 
-      <div class="route-track reveal">
-        <article class="route-stop" data-route-id="dombay">
-          <div class="route-image"><img src="assets/img/scenes/scene-ski.jpg" alt="Домбай" loading="lazy"><span class="route-check" aria-hidden="true">✓</span></div>
-          <div class="route-copy"><span class="route-month">Февраль</span><h3>Домбай</h3><p>горные лыжи</p></div>
-        </article>
-        <article class="route-stop" data-route-id="egypt">
-          <div class="route-image"><img src="assets/img/scenes/scene-egypt.jpg" alt="Египет" loading="lazy"><span class="route-check" aria-hidden="true">✓</span></div>
-          <div class="route-copy"><span class="route-month">Март — май</span><h3>Египет</h3><p>Красное море</p></div>
-        </article>
-        <article class="route-stop" data-route-id="pyatigorsk">
-          <div class="route-image"><img src="assets/img/scenes/scene-pyatigorsk.jpg" alt="Пятигорск" loading="lazy"><span class="route-check" aria-hidden="true">✓</span></div>
-          <div class="route-copy"><span class="route-month">Май — июль</span><h3>Пятигорск</h3><p>парапланы</p></div>
-        </article>
-        <article class="route-stop" data-route-id="dolzhanka">
-          <div class="route-image"><img src="assets/img/scenes/scene-dolzhanka.jpg" alt="Должанка" loading="lazy"><span class="route-check" aria-hidden="true">✓</span></div>
-          <div class="route-copy"><span class="route-month">Лето</span><h3>Должанка</h3><p>кайт каждый день</p></div>
-        </article>
-        <article class="route-stop" data-route-id="turkey">
-          <div class="route-image"><img src="assets/img/scenes/scene-turkey.jpg" alt="Турция" loading="lazy"><span class="route-check" aria-hidden="true">✓</span></div>
-          <div class="route-copy"><span class="route-month">Август — сентябрь</span><h3>Турция</h3><p>параглайдинг</p></div>
-        </article>
-        <article class="route-stop" data-route-id="vietnam">
-          <div class="route-image"><img src="assets/img/scenes/scene-vietnam.jpg" alt="Вьетнам" loading="lazy"><span class="route-check" aria-hidden="true">✓</span></div>
-          <div class="route-copy"><span class="route-month">Сентябрь — декабрь</span><h3>Вьетнам</h3><p>жизнь у океана</p></div>
-        </article>
-        <article class="route-stop" data-route-id="yacht">
-          <div class="route-image"><img src="assets/img/scenes/scene-yacht.jpg" alt="Яхты" loading="lazy"><span class="route-check" aria-hidden="true">✓</span></div>
-          <div class="route-copy"><span class="route-month">В путешествиях</span><h3>Яхты</h3><p>вместе по морям</p></div>
-        </article>
-        <article class="route-stop" data-route-id="business">
-          <div class="route-image"><img src="assets/img/scenes/scene-business.jpg" alt="Бизнес" loading="lazy"><span class="route-check" aria-hidden="true">✓</span></div>
-          <div class="route-copy"><span class="route-month">Весь год</span><h3>Бизнес</h3><p>без ручного управления</p></div>
-        </article>
-      </div>
+      <div class="route-track reveal" id="routeTrack"></div>
 
       <div class="route-foot reveal">
-        <span>8 остановок · 12 месяцев</span>
+        <span id="routeCount">10 остановок · 12 месяцев</span>
         <span>Отметки синхронизированы с карточками выше</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="section collage-section" id="collage">
-    <div class="container">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow reveal">03 / Коллаж</p>
-          <h2 class="reveal">Одна карта.<br><em>Три композиции.</em></h2>
-        </div>
-        <p class="section-note reveal">Текущий коллаж сохранён как «Классика». Выбери другой вариант — он запомнится в браузере.</p>
-      </div>
-
-      <div class="collage-toolbar reveal">
-        <div class="collage-tabs" role="tablist" aria-label="Вариант коллажа">
-          <button class="collage-tab is-active" type="button" data-collage-layout="mosaic" role="tab" aria-selected="true"><span>01</span>Классика</button>
-          <button class="collage-tab" type="button" data-collage-layout="grid" role="tab" aria-selected="false"><span>02</span>Сетка</button>
-          <button class="collage-tab" type="button" data-collage-layout="polaroid" role="tab" aria-selected="false"><span>03</span>Полароиды</button>
-        </div>
-        <button class="text-link" type="button" id="saveCollage">Сохранить выбор <span aria-hidden="true">↓</span></button>
-      </div>
-
-      <div class="collage-board is-mosaic reveal" id="collageBoard" role="tabpanel" aria-live="polite"></div>
-      <div class="collage-meta reveal">
-        <span id="collageName">Классика · угловая мозаика</span>
-        <span>10 кадров · 3 варианта</span>
       </div>
     </div>
   </section>
@@ -243,7 +182,7 @@
     <div class="container">
       <div class="section-head">
         <div>
-          <p class="eyebrow reveal">04 / Видеокарта</p>
+          <p class="eyebrow reveal">03 / Видеокарта</p>
           <h2 class="reveal">Один фильм.<br><em>Десять желаний.</em></h2>
         </div>
         <p class="section-note reveal">Все десять FAL-кадров собраны в один фильм. Включай на весь экран — или прыгай сразу к нужной главе.</p>
@@ -282,7 +221,7 @@
     <div class="container">
       <div class="section-head">
         <div>
-          <p class="eyebrow reveal">05 / Фильмы</p>
+          <p class="eyebrow reveal">04 / Фильмы</p>
           <h2 class="reveal">Желания<br><em>в движении.</em></h2>
         </div>
         <p class="section-note reveal">Два взгляда: полный локальный фильм и живой восьмисекундный этюд, сгенерированный в fal.ai. Оба со звуком.</p>
@@ -334,7 +273,7 @@
     <div class="container">
       <div class="section-head">
         <div>
-          <p class="eyebrow reveal">06 / Опоры</p>
+          <p class="eyebrow reveal">05 / Опоры</p>
           <h2 class="reveal">Чтобы мечта<br><em>выдержала реальность.</em></h2>
         </div>
         <p class="section-note reveal">Красивая карта не работает без трёх вещей: свободы от ручного управления, капитала и тела, которое выдерживает горы и море.</p>
@@ -367,7 +306,7 @@
     <div class="container">
       <div class="section-head">
         <div>
-          <p class="eyebrow reveal">07 / Как это работает</p>
+          <p class="eyebrow reveal">06 / Как это работает</p>
           <h2 class="reveal">Три шага.<br><em>Без пустого холста.</em></h2>
         </div>
         <p class="section-note reveal">Не нужно собирать коллаж в редакторе и печатать. Напиши желание — сайт сам разложит его по маршруту.</p>
@@ -402,7 +341,7 @@
     <div class="container">
       <div class="ritual-grid">
         <div>
-          <p class="eyebrow reveal">08 / Ритуал</p>
+          <p class="eyebrow reveal">07 / Ритуал</p>
           <h2 class="reveal">Раз в месяц.<br><em>15 минут.</em></h2>
         </div>
         <ol class="steps">
@@ -577,6 +516,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
 
-<script src="script.js?v=26" defer></script>
+<script src="script.js?v=30" defer></script>
 </body>
 </html>
