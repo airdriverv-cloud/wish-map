@@ -21,7 +21,7 @@
 <link rel="preload" href="assets/fonts/CormorantGaramond-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="preload" href="assets/fonts/Manrope-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="style.css?v=4">
-<link rel="stylesheet" href="app.css?v=7">
+<link rel="stylesheet" href="app.css?v=8">
 <script>document.documentElement.classList.replace('no-js','js');</script>
 </head>
 <body>
@@ -455,15 +455,39 @@
     <h2 id="imageModalTitle">Заменить кадр</h2>
     <p class="modal-lead" id="imageWishLabel">Опиши новый кадр — сгенерируем его прямо здесь, без регистрации.</p>
     <div class="image-modes" role="radiogroup" aria-label="Стиль изображения">
-      <button class="image-mode" type="button" data-image-mode="photo" role="radio" aria-checked="false" title="Реалистичное фото">
-        <b>Фото</b><small>реалистично</small>
-      </button>
       <button class="image-mode is-active" type="button" data-image-mode="cartoon" role="radio" aria-checked="true" title="Мультяшный кадр">
         <b>Мульт</b><small>2D-кадр</small>
       </button>
-      <button class="image-mode" type="button" data-image-mode="cinema" role="radio" aria-checked="false" title="Кинематографичный кадр">
-        <b>Кино</b><small>свет и глубина</small>
+      <button class="image-mode" type="button" data-image-mode="realistic" role="radio" aria-checked="false" title="Реалистичное фото">
+        <b>Реалити</b><small>фото</small>
       </button>
+      <button class="image-mode" type="button" data-image-mode="anime" role="radio" aria-checked="false" title="Аниме-кадр">
+        <b>Аниме</b><small>стилизация</small>
+      </button>
+      <button class="image-mode" type="button" data-image-mode="watercolor" role="radio" aria-checked="false" title="Акварельный кадр">
+        <b>Акварель</b><small>мягко</small>
+      </button>
+      <button class="image-mode" type="button" data-image-mode="neon" role="radio" aria-checked="false" title="Неоновый кадр">
+        <b>Неон</b><small>киберпанк</small>
+      </button>
+      <button class="image-mode" type="button" data-image-mode="render3d" role="radio" aria-checked="false" title="3D-кадр">
+        <b>3D</b><small>объём</small>
+      </button>
+      <button class="image-mode fal-mode" type="button" data-image-mode="fal" role="radio" aria-checked="false" title="FAL-генерация по PIN">
+        <b>FAL</b><small>PIN</small>
+      </button>
+    </div>
+
+    <div class="fal-pin" id="falPinPanel" hidden>
+      <div class="fal-pin-head">
+        <span class="eyebrow">FAL · доступ по PIN</span>
+        <p>Введи код, чтобы открыть FAL-генерацию.</p>
+      </div>
+      <div class="fal-pin-row">
+        <input id="falPin" type="password" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="••••" aria-label="PIN-код FAL">
+        <button class="btn" type="button" id="unlockFal">Открыть</button>
+      </div>
+      <p class="micro" id="falPinStatus">PIN спрашивается один раз за сессию.</p>
     </div>
     <label class="field">
       <span>Что должно быть на кадре?</span>
@@ -505,6 +529,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
 
-<script src="script.js?v=10" defer></script>
+<script src="script.js?v=11" defer></script>
 </body>
 </html>

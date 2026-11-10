@@ -48,22 +48,45 @@
   let lastFocused = null;
   let imageWishId = null;
   let imageMode = 'cartoon';
+  const FAL_PIN = '6620';
+  let falUnlocked = false;
+  try { falUnlocked = sessionStorage.getItem('wishmap-fal-unlocked') === '1'; } catch {}
 
   const IMAGE_MODES = {
-    photo: {
-      label: 'Фото',
-      placeholder: 'Например: пара на яхте в бирюзовой бухте, тёплый закат',
-      style: 'realistic editorial travel photograph, natural light, 35mm, warm film colors'
-    },
     cartoon: {
       label: 'Мульт',
       placeholder: 'Например: пара на яхте в бирюзовой бухте, тёплый закат',
       style: 'hand-painted 2D cartoon illustration, warm cinematic palette, soft grain, storybook animation'
     },
-    cinema: {
-      label: 'Кино',
+    realistic: {
+      label: 'Реалити',
       placeholder: 'Например: пара на яхте в бирюзовой бухте, тёплый закат',
-      style: 'cinematic 3D animation still, volumetric light, shallow depth of field, rich color grade'
+      style: 'realistic editorial travel photograph, natural light, 35mm, warm film colors'
+    },
+    anime: {
+      label: 'Аниме',
+      placeholder: 'Например: герой на крыше Токио, неон, дождь',
+      style: 'anime key visual, clean line art, expressive eyes, cinematic lighting, detailed background'
+    },
+    watercolor: {
+      label: 'Акварель',
+      placeholder: 'Например: горы в утреннем тумане, пастельные цвета',
+      style: 'soft watercolor painting, paper texture, gentle washes, delicate ink lines'
+    },
+    neon: {
+      label: 'Неон',
+      placeholder: 'Например: ночной город, неоновые вывески, дождь',
+      style: 'neon cyberpunk illustration, glowing magenta and cyan, wet asphalt reflections, cinematic night'
+    },
+    render3d: {
+      label: '3D',
+      placeholder: 'Например: уютный дом у моря, пластилиновый стиль',
+      style: 'stylized 3D render, soft clay materials, cinematic depth of field, warm studio light'
+    },
+    fal: {
+      label: 'FAL',
+      placeholder: 'Опиши кадр для FAL: кто, где, свет, настроение',
+      style: 'premium cinematic illustration, rich detail, dramatic lighting, refined color grade'
     }
   };
 
@@ -100,6 +123,10 @@
     imageDetails: $('#imageDetails'),
     generateImage: $('#generateImage'),
     imageStatus: $('#imageStatus'),
+    falPinPanel: $('#falPinPanel'),
+    falPin: $('#falPin'),
+    unlockFal: $('#unlockFal'),
+    falPinStatus: $('#falPinStatus'),
     copyImageRequest: $('#copyImageRequest'),
     toast: $('#toast')
   };
@@ -387,6 +414,19 @@
   /* ---------- image generation (no account) ---------- */
   function setImageMode(mode) {
     if (!IMAGE_MODES[mode]) return;
+    if (mode === 'fal' && !falUnlocked) {
+      if (els.falPinPanel) els.falPinPanel.hidden = false;
+      if (els.falPinStatus) {
+        els.falPinStatus.textContent = 'Введи PIN, чтобы открыть FAL-генерацию.';
+        els.falPinStatus.classList.remove('is-error');
+      }
+      $$('.image-mode').forEach((button) => {
+        button.classList.remove('is-active');
+        button.setAttribute('aria-checked', 'false');
+      });
+      window.setTimeout(() => els.falPin?.focus(), 60);
+      return;
+    }
     imageMode = mode;
     $$('.image-mode').forEach((button) => {
       const active = button.dataset.imageMode === mode;
@@ -394,6 +434,28 @@
       button.setAttribute('aria-checked', String(active));
     });
     if (els.imagePrompt) els.imagePrompt.placeholder = IMAGE_MODES[mode].placeholder;
+    if (els.falPinPanel) els.falPinPanel.hidden = true;
+  }
+
+  function unlockFal() {
+    const value = els.falPin?.value.trim() || '';
+    if (value !== FAL_PIN) {
+      if (els.falPinStatus) {
+        els.falPinStatus.textContent = 'Неверный PIN. Попробуй ещё раз.';
+        els.falPinStatus.classList.add('is-error');
+      }
+      els.falPin?.focus();
+      els.falPin?.select();
+      return;
+    }
+    falUnlocked = true;
+    try { sessionStorage.setItem('wishmap-fal-unlocked', '1'); } catch {}
+    if (els.falPinStatus) {
+      els.falPinStatus.textContent = 'FAL открыт. Теперь можно генерировать.';
+      els.falPinStatus.classList.remove('is-error');
+    }
+    setImageMode('fal');
+    showToast('FAL-режим открыт');
   }
 
   function openImageModal(id) {
@@ -413,6 +475,8 @@
       els.imageStatus.textContent = 'Без аккаунта. Опиши кадр — подберу фото или сгенерирую.';
       els.imageStatus.classList.remove('is-error');
     }
+    if (els.falPinPanel) els.falPinPanel.hidden = true;
+    if (els.falPin) els.falPin.value = '';
     setImageMode('cartoon');
     openModal(els.imageModal);
     window.setTimeout(() => els.imagePrompt?.focus(), 80);
@@ -517,6 +581,26 @@
     }
   }
 
+  async function generateWithFal(prompt) {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), 90000);
+    try {
+      const response = await fetch('http://127.0.0.1:8189/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: FAL_PIN, prompt }),
+        signal: controller.signal
+      });
+      if (!response.ok) throw new Error('fal bridge ' + response.status);
+      const data = await response.json();
+      if (!data?.url) throw new Error('fal no image');
+      await loadImage(data.url, 30000);
+      return data.url;
+    } finally {
+      window.clearTimeout(timer);
+    }
+  }
+
   async function generateImage() {
     const prompt = els.imagePrompt?.value.trim() || '';
     if (!prompt) {
@@ -524,24 +608,40 @@
       els.imagePrompt?.focus();
       return;
     }
+    if (imageMode === 'fal' && !falUnlocked) {
+      setImageMode('fal');
+      return;
+    }
     const wish = state.wishes.find((item) => item.id === imageWishId);
     if (!wish) return;
 
     const details = els.imageDetails?.value.trim() || '';
     const mode = IMAGE_MODES[imageMode];
-    setGenerateBusy(true, 'Без аккаунта. Ищу или генерирую кадр…');
+    setGenerateBusy(true, imageMode === 'fal' ? 'FAL генерирует кадр…' : 'Без аккаунта. Ищу или генерирую кадр…');
 
     let imageUrl = null;
     let used = '';
 
-    if (imageMode !== 'photo') {
+    const english = await translateToEnglish([prompt, details].filter(Boolean).join('. '));
+    const fullPrompt = [
+      english,
+      mode.style,
+      'vertical 4:5 composition, no text, no letters, no watermark, no logo'
+    ].filter(Boolean).join('. ');
+
+    if (imageMode === 'fal') {
       try {
-        const english = await translateToEnglish([prompt, details].filter(Boolean).join('. '));
-        const fullPrompt = [
-          english,
-          mode.style,
-          'vertical 4:5 composition, no text, no letters, no watermark, no logo'
-        ].filter(Boolean).join('. ');
+        imageUrl = await generateWithFal(fullPrompt);
+        used = 'fal';
+      } catch {
+        if (els.imageStatus) {
+          els.imageStatus.textContent = 'FAL-мост не ответил — генерирую резервный кадр…';
+        }
+      }
+    }
+
+    if (!imageUrl && imageMode !== 'realistic') {
+      try {
         const seed = Math.floor(Math.random() * 1_000_000_000);
         const candidate = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(fullPrompt) +
           `?width=640&height=800&seed=${seed}&nologo=true`;
@@ -569,7 +669,8 @@
     renderWishes();
     setGenerateBusy(false);
     closeModal(els.imageModal);
-    if (used === 'generated') showToast('Новый кадр сгенерирован — без регистрации');
+    if (used === 'fal') showToast('FAL-кадр готов — PIN принят');
+    else if (used === 'generated') showToast('Новый кадр сгенерирован — без регистрации');
     else if (used === 'photo') showToast('Подобрал новый кадр — без регистрации');
     else showToast('Поставил кадр из коллекции — без регистрации');
   }
@@ -879,6 +980,13 @@
   els.wishForm?.addEventListener('submit', saveWish);
   els.deleteWish?.addEventListener('click', deleteWish);
   els.generateImage?.addEventListener('click', generateImage);
+  els.unlockFal?.addEventListener('click', unlockFal);
+  els.falPin?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      unlockFal();
+    }
+  });
   els.copyImageRequest?.addEventListener('click', copyImageRequest);
   $$('.image-mode').forEach((button) => {
     button.addEventListener('click', () => setImageMode(button.dataset.imageMode));
