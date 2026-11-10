@@ -2,21 +2,21 @@
 
 @font-face {
   font-family: "Cormorant";
-  src: url("assets/fonts/CormorantGaramond-Regular.ttf") format("truetype");
+  src: url("assets/fonts/CormorantGaramond-Regular.woff2") format("woff2"), url("assets/fonts/CormorantGaramond-Regular.ttf") format("truetype");
   font-weight: 300 700;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Cormorant";
-  src: url("assets/fonts/CormorantGaramond-Italic.ttf") format("truetype");
+  src: url("assets/fonts/CormorantGaramond-Italic.woff2") format("woff2"), url("assets/fonts/CormorantGaramond-Italic.ttf") format("truetype");
   font-weight: 300 700;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
   font-family: "Manrope";
-  src: url("assets/fonts/Manrope-Regular.ttf") format("truetype");
+  src: url("assets/fonts/Manrope-Regular.woff2") format("woff2"), url("assets/fonts/Manrope-Regular.ttf") format("truetype");
   font-weight: 200 800;
   font-style: normal;
   font-display: swap;

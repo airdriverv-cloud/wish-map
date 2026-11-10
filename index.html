@@ -18,10 +18,10 @@
 <meta name="twitter:image" content="https://airdriverv-cloud.github.io/wish-map/assets/img/og.jpg">
 <link rel="canonical" href="https://airdriverv-cloud.github.io/wish-map/">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<link rel="preload" href="assets/fonts/CormorantGaramond-Regular.ttf" as="font" type="font/ttf" crossorigin>
-<link rel="preload" href="assets/fonts/Manrope-Regular.ttf" as="font" type="font/ttf" crossorigin>
-<link rel="stylesheet" href="style.css?v=4">
-<link rel="stylesheet" href="app.css?v=14">
+<link rel="preload" href="assets/fonts/CormorantGaramond-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/Manrope-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css?v=23">
+<link rel="stylesheet" href="app.css?v=22">
 <script>document.documentElement.classList.replace('no-js','js');</script>
 </head>
 <body>
@@ -244,8 +244,8 @@
       </div>
 
       <div class="fal-film reveal">
-        <video id="falFilmVideo" poster="assets/img/fal-film-poster.jpg" controls playsinline preload="metadata">
-          <source src="assets/video/fal-wish-map.mp4" type="video/mp4">
+        <video id="falFilmVideo" poster="assets/img/fal-film-poster.jpg" controls playsinline preload="none">
+          <source src="assets/video/fal-wish-map.mp4?v=2" type="video/mp4">
           Ваш браузер не поддерживает видео.
         </video>
         <button class="fal-expand" id="falExpand" type="button">На весь экран <span aria-hidden="true">⛶</span></button>
@@ -265,7 +265,7 @@
           <button class="fal-chapter" type="button" data-start="40.5" aria-label="Глава 10: Бизнес"><span>10</span>Бизнес</button>
         </div>
         <div class="fal-film-links">
-          <a class="text-link" href="assets/video/fal-wish-map.mp4" download>Скачать фильм <span aria-hidden="true">↓</span></a>
+          <a class="text-link" href="assets/video/fal-wish-map.mp4?v=2" download>Скачать фильм <span aria-hidden="true">↓</span></a>
           <a class="text-link" href="assets/video/fal-clips.zip" download>10 клипов <span aria-hidden="true">↓</span></a>
         </div>
       </div>
@@ -286,8 +286,8 @@
         <article class="video-card reveal">
           <div class="video-label"><span>01 / Локальный</span><span>51 секунда</span></div>
           <div class="video-shell" id="videoShell">
-            <video id="wishVideo" poster="assets/img/video-poster-local.jpg" playsinline preload="metadata">
-              <source src="assets/video/wish-map.mp4" type="video/mp4">
+            <video id="wishVideo" poster="assets/img/video-poster-local.jpg" playsinline preload="none">
+              <source src="assets/video/wish-map.mp4?v=2" type="video/mp4">
               Ваш браузер не поддерживает видео.
             </video>
             <button class="video-play" id="videoPlay" type="button" aria-label="Смотреть мультфильм">
@@ -302,8 +302,8 @@
         <article class="video-card reveal">
           <div class="video-label"><span>02 / FAL.AI</span><span>8 секунд</span></div>
           <div class="video-shell" id="falShell">
-            <video id="falVideo" poster="assets/img/fal-poster.jpg" playsinline preload="metadata">
-              <source src="assets/video/fal-vietnam.mp4" type="video/mp4">
+            <video id="falVideo" poster="assets/img/fal-poster.jpg" playsinline preload="none">
+              <source src="assets/video/fal-vietnam.mp4?v=2" type="video/mp4">
               Ваш браузер не поддерживает видео.
             </video>
             <button class="video-play" id="falPlay" type="button" aria-label="Смотреть FAL-этюд">
@@ -318,8 +318,8 @@
 
       <div class="video-meta reveal">
         <span>10 целей</span><span>8 направлений</span><span>одна жизнь</span>
-        <a class="text-link" href="assets/video/wish-map.mp4" download>Скачать локальный <span aria-hidden="true">↓</span></a>
-        <a class="text-link" href="assets/video/fal-vietnam.mp4" download>Скачать FAL <span aria-hidden="true">↓</span></a>
+        <a class="text-link" href="assets/video/wish-map.mp4?v=2" download>Скачать локальный <span aria-hidden="true">↓</span></a>
+        <a class="text-link" href="assets/video/fal-vietnam.mp4?v=2" download>Скачать FAL <span aria-hidden="true">↓</span></a>
       </div>
     </div>
   </section>
@@ -571,6 +571,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
 
-<script src="script.js?v=17" defer></script>
+<script src="script.js?v=24" defer></script>
 </body>
 </html>
