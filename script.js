@@ -4,6 +4,7 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   const STORAGE_KEY = 'wishmap-viktor-v2';
+  const IMAGE_DRAFT_KEY = 'wishmap-image-drafts-v1';
   const CARD_IMAGES = {
     dombay: 'assets/img/card-01.jpg',
     egypt: 'assets/img/card-02.jpg',
@@ -49,6 +50,8 @@
   let imageWishId = null;
   let deleteArmed = false;
   let deleteTimer = null;
+  let draftTimer = null;
+  let restoringDraft = false;
   let imageMethod = 'find';
   let imageStyle = 'cartoon';
   const FAL_PIN = '6620';
@@ -471,6 +474,7 @@
     });
     if (els.falPinPanel) els.falPinPanel.hidden = true;
     updateGenerateButton();
+    saveImageDraft();
   }
 
   function setImageStyle(style) {
@@ -482,6 +486,7 @@
       button.setAttribute('aria-checked', String(active));
     });
     if (els.imagePrompt) els.imagePrompt.placeholder = IMAGE_STYLES[style].placeholder;
+    saveImageDraft();
   }
 
   function unlockFal() {
@@ -501,7 +506,41 @@
       els.falPinStatus.classList.remove('is-error');
     }
     setImageMethod('fal');
+    saveImageDraft();
     showToast('FAL-режим открыт');
+  }
+
+  function readImageDrafts() {
+    try {
+      return JSON.parse(localStorage.getItem(IMAGE_DRAFT_KEY) || '{}') || {};
+    } catch {
+      return {};
+    }
+  }
+
+  function getImageDraft(id) {
+    if (!id) return {};
+    const draft = readImageDrafts()[id];
+    return draft && typeof draft === 'object' ? draft : {};
+  }
+
+  function saveImageDraft() {
+    if (!imageWishId || restoringDraft) return;
+    if (draftTimer) window.clearTimeout(draftTimer);
+    draftTimer = window.setTimeout(() => {
+      try {
+        const drafts = readImageDrafts();
+        drafts[imageWishId] = {
+          prompt: els.imagePrompt?.value || '',
+          details: els.imageDetails?.value || '',
+          method: imageMethod,
+          style: imageStyle
+        };
+        localStorage.setItem(IMAGE_DRAFT_KEY, JSON.stringify(drafts));
+      } catch {
+        // текст не критичен для работы карты
+      }
+    }, 180);
   }
 
   function openImageModal(id) {
@@ -515,17 +554,26 @@
     if (els.imageWishLabel) {
       els.imageWishLabel.innerHTML = `Желание: <b>${escapeHtml(wish.title)}</b>. Выбери способ, вид и опиши кадр.`;
     }
-    if (els.imagePrompt) els.imagePrompt.value = '';
-    if (els.imageDetails) els.imageDetails.value = '';
+    const draft = getImageDraft(id);
+    restoringDraft = true;
+    if (els.imagePrompt) els.imagePrompt.value = draft.prompt || '';
+    if (els.imageDetails) els.imageDetails.value = draft.details || '';
     if (els.imageStatus) {
-      els.imageStatus.textContent = 'Без аккаунта. Найти, сгенерировать на ноутбуке или через FAL.';
+      els.imageStatus.textContent = 'Без аккаунта. Текст сохраняется для этого желания.';
       els.imageStatus.classList.remove('is-error');
     }
     falUnlocked = false;
     if (els.falPinPanel) els.falPinPanel.hidden = true;
     if (els.falPin) els.falPin.value = '';
-    setImageMethod('find');
-    setImageStyle('cartoon');
+    if (draft.method === 'fal') {
+      imageMethod = 'find';
+      falUnlocked = false;
+      setImageMethod('fal');
+    } else {
+      setImageMethod(draft.method || 'find');
+    }
+    setImageStyle(draft.style || 'cartoon');
+    restoringDraft = false;
     openModal(els.imageModal);
     window.setTimeout(() => els.imagePrompt?.focus(), 80);
   }
@@ -766,6 +814,7 @@
       }
     }
 
+    saveImageDraft();
     if (imageMethod === 'fal') falUnlocked = false;
     wish.image = imageUrl;
     saveLocal();
@@ -1083,6 +1132,8 @@
   els.importShared?.addEventListener('click', importShared);
   els.wishForm?.addEventListener('submit', saveWish);
   els.deleteWish?.addEventListener('click', deleteWish);
+  els.imagePrompt?.addEventListener('input', saveImageDraft);
+  els.imageDetails?.addEventListener('input', saveImageDraft);
   els.generateImage?.addEventListener('click', generateImage);
   els.unlockFal?.addEventListener('click', unlockFal);
   els.falPin?.addEventListener('keydown', (event) => {
