@@ -924,14 +924,14 @@
     }
   }
 
-  async function startComfy(base, prompt, headers, timeout) {
+  async function startComfy(base, prompt, headers, timeout, seed) {
     const controller = new AbortController();
     const timer = window.setTimeout(() => controller.abort(), timeout);
     try {
       const response = await fetch(`${base}/generate`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ prompt, seed }),
         signal: controller.signal
       });
       if (!response.ok) throw new Error('comfy start ' + response.status);
@@ -947,26 +947,28 @@
     }
   }
 
-  async function remoteGenerate(prompt) {
+  async function remoteGenerate(prompt, seed) {
     return startComfy(
       REMOTE_COMFY_URL,
       prompt,
       { 'Content-Type': 'application/json', 'X-Wishmap-Pin': REMOTE_COMFY_PIN },
-      90000
+      180000,
+      seed
     );
   }
 
-  async function localGenerate(prompt) {
+  async function localGenerate(prompt, seed) {
     try {
       const url = await startComfy(
         'http://127.0.0.1:8190',
         prompt,
         { 'Content-Type': 'application/json', 'X-Wishmap-Pin': REMOTE_COMFY_PIN },
-        90000
+        180000,
+        seed
       );
       return { url, via: 'local' };
     } catch {
-      const url = await remoteGenerate(prompt);
+      const url = await remoteGenerate(prompt, seed);
       return { url, via: 'remote' };
     }
   }
@@ -1046,13 +1048,13 @@
       </figure>`).join('');
   }
 
-  async function generateSingle(fullPrompt, prompt, details, wish) {
+  async function generateSingle(fullPrompt, prompt, details, wish, seed) {
     let imageUrl = null;
     let used = '';
 
     if (imageMethod === 'local') {
       try {
-        const local = await localGenerate(fullPrompt);
+        const local = await localGenerate(fullPrompt, seed);
         imageUrl = local.url;
         used = local.via;
       } catch {
@@ -1071,7 +1073,6 @@
 
     if (!imageUrl && imageMethod !== 'find') {
       try {
-        const seed = Math.floor(Math.random() * 1_000_000_000);
         const candidate = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(fullPrompt) +
           `?width=640&height=800&seed=${seed}&nologo=true`;
         imageUrl = await loadImage(candidate, 40000);
@@ -1120,13 +1121,21 @@
       .filter(Boolean).join('. ');
 
     const results = [];
+    const variations = [
+      'wide establishing shot, different composition',
+      'closer angle, different light',
+      'alternate framing, slightly different moment',
+      'different camera position, new details'
+    ];
     for (let index = 0; index < count; index += 1) {
       if (els.imageStatus) {
         els.imageStatus.textContent = `Генерирую ${index + 1} из ${count}…`;
         els.imageStatus.classList.remove('is-error');
       }
       try {
-        const result = await generateSingle(fullPrompt, prompt, details, wish);
+        const seed = Math.floor(Math.random() * 2_000_000_000);
+        const variantPrompt = `${fullPrompt}. Variation ${index + 1}: ${variations[index % variations.length]}.`;
+        const result = await generateSingle(variantPrompt, prompt, details, wish, seed);
         if (result?.url) results.push(result);
       } catch {
         // пробуем следующий вариант
@@ -1143,19 +1152,20 @@
       return;
     }
 
+    const uniqueResults = [...new Set(results.map((item) => item.url))];
     saveImageDraft();
     if (imageMethod === 'fal') falUnlocked = false;
-    wish.gallery = [...new Set([...results.map((item) => item.url), ...(wish.gallery || [])])].slice(0, 30);
-    wish.image = results[0].url;
+    wish.gallery = [...new Set([...uniqueResults, ...(wish.gallery || [])])].slice(0, 30);
+    wish.image = uniqueResults[0];
     saveLocal();
     renderWishes();
     renderGallery();
     setGenerateBusy(false);
     if (els.imageStatus) {
-      els.imageStatus.textContent = `Готово: ${results.length}. Выбери кадр из галереи.`;
+      els.imageStatus.textContent = `Готово: ${uniqueResults.length}. Выбери кадр из галереи.`;
       els.imageStatus.classList.remove('is-error');
     }
-    showToast(`Добавлено вариантов: ${results.length}`);
+    showToast(`Добавлено вариантов: ${uniqueResults.length}`);
   }
 
   function copyImageRequest() {
