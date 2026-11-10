@@ -919,3 +919,63 @@ button.text-link:hover { border-color: var(--gold); }
 
 .wish-grid.is-polaroid .wish-month { max-width: calc(100% - 64px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wish-grid.is-polaroid .wish-replace { padding: 4px 5px; font-size: 7px; }
+
+/* example wishes */
+.examples-section { padding-top: 90px; }
+.example-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+.example-filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.example-filter {
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-family: "Manrope", sans-serif;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.example-filter span { color: var(--gold); }
+.example-filter:hover { color: var(--cream); border-color: rgba(201, 160, 99, 0.55); }
+.example-filter.is-active { background: var(--gold); border-color: var(--gold); color: #10231d; }
+.example-filter.is-active span { color: #10231d; }
+.example-count { color: var(--muted); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; }
+.example-card .wish-body { gap: 7px; }
+.example-add {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 6px 9px;
+  border: 1px solid rgba(201, 160, 99, 0.42);
+  background: transparent;
+  color: var(--gold-light);
+  font-family: "Manrope", sans-serif;
+  font-size: 7px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.example-add:hover { background: var(--gold); border-color: var(--gold); color: #10231d; }
+.example-add.is-added { border-color: var(--line); color: var(--muted); cursor: default; }
+.wish-grid.is-polaroid .example-add { color: #8b6a3f; border-color: rgba(139, 106, 63, 0.45); }
+.wish-grid.is-polaroid .example-add:hover { background: #8b6a3f; color: #fffaf0; }
+@media (max-width: 700px) {
+  .example-toolbar { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .example-filters { flex-wrap: nowrap; overflow-x: auto; width: calc(100vw - 44px); padding-bottom: 4px; scrollbar-width: none; }
+  .example-filters::-webkit-scrollbar { display: none; }
+  .example-filter { flex: 0 0 auto; }
+}
+
+.wish-group-head {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding-top: 20px;
+  margin-top: 2px;
+  border-top: 1px solid var(--line-soft);
+}
+.wish-group-head:first-child { padding-top: 0; border-top: 0; }
+.wish-group-head span { color: var(--gold); font-size: 8px; letter-spacing: 0.16em; }
+.wish-group-head h3 { margin: 0; color: var(--cream); font-family: "Cormorant", Georgia, serif; font-size: 30px; font-weight: 500; line-height: 1; }
+.wish-group-head small { color: var(--muted); font-size: 8px; letter-spacing: 0.12em; }
+.wish-grid.is-polaroid .wish-group-head h3 { color: var(--cream); }

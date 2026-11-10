@@ -20,8 +20,8 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/CormorantGaramond-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/Manrope-Regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="style.css?v=23">
-<link rel="stylesheet" href="app.css?v=28">
+<link rel="stylesheet" href="style.css?v=24">
+<link rel="stylesheet" href="app.css?v=31">
 <script>document.documentElement.classList.replace('no-js','js');</script>
 </head>
 <body>
@@ -35,6 +35,7 @@
     </a>
     <nav class="nav" id="nav" aria-label="Основная навигация">
       <a href="#wishes">Желания</a>
+      <a href="#examples">Примеры</a>
       <a href="#route">Маршрут</a>
       <a href="#video-map">Видео</a>
       <a href="#how">Как это работает</a>
@@ -137,6 +138,8 @@
           <button class="filter" type="button" data-filter="travel">Путешествия</button>
           <button class="filter" type="button" data-filter="business">Дело</button>
           <button class="filter" type="button" data-filter="love">Любовь</button>
+          <button class="filter" type="button" data-filter="body">Тело</button>
+          <button class="filter" type="button" data-filter="creativity">Творчество</button>
         </div>
         <p class="wish-count" id="wishCount">10 желаний</p>
       </div>
@@ -159,11 +162,37 @@
     </div>
   </section>
 
+  <section class="section examples-section" id="examples">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow reveal">02 / Примеры</p>
+          <h2 class="reveal">50 желаний.<br><em>Для вдохновения.</em></h2>
+        </div>
+        <p class="section-note reveal">Готовые идеи по типам. Нажми «В мою карту» — желание появится у тебя с категорией и картинкой.</p>
+      </div>
+
+      <div class="example-toolbar reveal">
+        <div class="example-filters" role="group" aria-label="Тип примеров">
+          <button class="example-filter is-active" type="button" data-example-filter="all">Все <span>50</span></button>
+          <button class="example-filter" type="button" data-example-filter="travel">Путешествия</button>
+          <button class="example-filter" type="button" data-example-filter="body">Тело</button>
+          <button class="example-filter" type="button" data-example-filter="business">Дело</button>
+          <button class="example-filter" type="button" data-example-filter="love">Любовь</button>
+          <button class="example-filter" type="button" data-example-filter="creativity">Творчество</button>
+        </div>
+        <span class="example-count" id="exampleCount">50 идей</span>
+      </div>
+
+      <div class="wish-grid examples-grid is-mosaic" id="examplesGrid" aria-live="polite"></div>
+    </div>
+  </section>
+
   <section class="section route-section" id="route">
     <div class="container">
       <div class="section-head">
         <div>
-          <p class="eyebrow reveal">02 / Маршрут</p>
+          <p class="eyebrow reveal">03 / Маршрут</p>
           <h2 class="reveal">Год, разложенный<br><em>по месяцам.</em></h2>
         </div>
         <p class="section-note reveal">Не сетка из картинок, а маршрут: когда, куда и что должно случиться. Отмечай желание — остановка загорается.</p>
@@ -182,7 +211,7 @@
     <div class="container">
       <div class="section-head">
         <div>
-          <p class="eyebrow reveal">03 / Видеокарта</p>
+          <p class="eyebrow reveal">04 / Видеокарта</p>
           <h2 class="reveal">Один фильм.<br><em>Десять желаний.</em></h2>
         </div>
         <p class="section-note reveal">Все десять FAL-кадров собраны в один фильм. Включай на весь экран — или прыгай сразу к нужной главе.</p>
@@ -221,7 +250,7 @@
     <div class="container">
       <div class="section-head">
         <div>
-          <p class="eyebrow reveal">04 / Фильмы</p>
+          <p class="eyebrow reveal">05 / Фильмы</p>
           <h2 class="reveal">Желания<br><em>в движении.</em></h2>
         </div>
         <p class="section-note reveal">Два взгляда: полный локальный фильм и живой восьмисекундный этюд, сгенерированный в fal.ai. Оба со звуком.</p>
@@ -273,7 +302,7 @@
     <div class="container">
       <div class="section-head">
         <div>
-          <p class="eyebrow reveal">05 / Опоры</p>
+          <p class="eyebrow reveal">06 / Опоры</p>
           <h2 class="reveal">Чтобы мечта<br><em>выдержала реальность.</em></h2>
         </div>
         <p class="section-note reveal">Красивая карта не работает без трёх вещей: свободы от ручного управления, капитала и тела, которое выдерживает горы и море.</p>
@@ -306,7 +335,7 @@
     <div class="container">
       <div class="section-head">
         <div>
-          <p class="eyebrow reveal">06 / Как это работает</p>
+          <p class="eyebrow reveal">07 / Как это работает</p>
           <h2 class="reveal">Три шага.<br><em>Без пустого холста.</em></h2>
         </div>
         <p class="section-note reveal">Не нужно собирать коллаж в редакторе и печатать. Напиши желание — сайт сам разложит его по маршруту.</p>
@@ -341,7 +370,7 @@
     <div class="container">
       <div class="ritual-grid">
         <div>
-          <p class="eyebrow reveal">07 / Ритуал</p>
+          <p class="eyebrow reveal">08 / Ритуал</p>
           <h2 class="reveal">Раз в месяц.<br><em>15 минут.</em></h2>
         </div>
         <ol class="steps">
@@ -405,10 +434,12 @@
         <label class="field">
           <span>Категория</span>
           <select id="wishCategory" name="category">
-            <option value="travel">Путешествие</option>
-            <option value="business">Дело</option>
-            <option value="love">Любовь</option>
-            <option value="dream">Мечта</option>
+            <option value="travel">Путешествия и приключения</option>
+            <option value="body">Тело и энергия</option>
+            <option value="business">Дело и деньги</option>
+            <option value="love">Любовь и люди</option>
+            <option value="creativity">Творчество и смысл</option>
+            <option value="dream">Другая мечта</option>
           </select>
         </label>
       </div>
@@ -516,6 +547,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
 
-<script src="script.js?v=30" defer></script>
+<script src="script.js?v=33" defer></script>
 </body>
 </html>

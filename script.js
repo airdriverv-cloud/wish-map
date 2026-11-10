@@ -32,10 +32,88 @@
   ];
 
   const CATEGORY_LABEL = {
+    travel: 'Путешествия и приключения',
+    body: 'Тело и энергия',
+    business: 'Дело и деньги',
+    love: 'Любовь и люди',
+    creativity: 'Творчество и смысл',
+    dream: 'Другая мечта'
+  };
+
+  const CATEGORY_ORDER = ['travel', 'body', 'business', 'love', 'creativity', 'dream'];
+
+  const CATEGORY_SHORT = {
     travel: 'Путешествие',
+    body: 'Тело',
     business: 'Дело',
     love: 'Любовь',
+    creativity: 'Творчество',
     dream: 'Мечта'
+  };
+
+  const EXAMPLES = [
+    { id: 'ex-t1', category: 'travel', title: 'Северное сияние в Териберке', note: 'февраль, мороз, термос' },
+    { id: 'ex-t2', category: 'travel', title: 'Месяц в Тбилиси', note: 'без рабочего ноутбука' },
+    { id: 'ex-t3', category: 'travel', title: 'Байкал по льду', note: 'собачья упряжка' },
+    { id: 'ex-t4', category: 'travel', title: 'Трек в Доломитах', note: '4 дня, ночёвки в приютах' },
+    { id: 'ex-t5', category: 'travel', title: 'Рассвет на вулкане', note: 'подъём ночью' },
+    { id: 'ex-t6', category: 'travel', title: 'Яхта Турция — Греция', note: '7 дней' },
+    { id: 'ex-t7', category: 'travel', title: 'Остров без интернета', note: 'неделя' },
+    { id: 'ex-t8', category: 'travel', title: 'Сакура в Японии', note: 'апрель' },
+    { id: 'ex-t9', category: 'travel', title: 'Road trip Грузия — Армения', note: '10 дней' },
+    { id: 'ex-t10', category: 'travel', title: 'Домик у океана', note: 'месяц с сёрферами' },
+
+    { id: 'ex-b1', category: 'body', title: '30 дней без будильника', note: 'просыпаться самому' },
+    { id: 'ex-b2', category: 'body', title: 'Полный чек-ап', note: 'закрыть все риски' },
+    { id: 'ex-b3', category: 'body', title: '8 часов сна 30 дней', note: 'без исключений' },
+    { id: 'ex-b4', category: 'body', title: '2 км в открытой воде', note: 'без остановки' },
+    { id: 'ex-b5', category: 'body', title: '15 подтягиваний', note: 'чистая техника' },
+    { id: 'ex-b6', category: 'body', title: '10 дней тишины', note: 'ретрит без телефона' },
+    { id: 'ex-b7', category: 'body', title: 'Месяц без алкоголя', note: 'проверить энергию' },
+    { id: 'ex-b8', category: 'body', title: 'Курс первой помощи', note: 'уметь спасать' },
+    { id: 'ex-b9', category: 'body', title: 'Полумарафон', note: 'финиш без травмы' },
+    { id: 'ex-b10', category: 'body', title: 'Неделя цифрового детокса', note: 'телефон в ящике' },
+
+    { id: 'ex-d1', category: 'business', title: 'Бизнес 30 дней без меня', note: 'команда и регламенты' },
+    { id: 'ex-d2', category: 'business', title: '1 000 000 ₽ 12 месяцев', note: 'стабильно, не разово' },
+    { id: 'ex-d3', category: 'business', title: 'Подушка на 12 месяцев', note: 'расходы закрыты' },
+    { id: 'ex-d4', category: 'business', title: 'Первый коммерческий объект', note: 'доход с актива' },
+    { id: 'ex-d5', category: 'business', title: 'Продукт на 100 клиентов', note: 'проверить спрос' },
+    { id: 'ex-d6', category: 'business', title: 'Выступить на конференции', note: 'своя тема' },
+    { id: 'ex-d7', category: 'business', title: 'Нанять COO', note: 'сильнее меня в операционке' },
+    { id: 'ex-d8', category: 'business', title: 'Автоматизировать 80% рутины', note: 'освободить время' },
+    { id: 'ex-d9', category: 'business', title: 'Инвестировать в 3 проекта', note: 'деньги работают' },
+    { id: 'ex-d10', category: 'business', title: '3 месяца вне операционки', note: 'проверить свободу' },
+
+    { id: 'ex-l1', category: 'love', title: '12 свиданий в новых местах', note: 'раз в месяц' },
+    { id: 'ex-l2', category: 'love', title: 'Ужины без телефонов', note: 'каждый день' },
+    { id: 'ex-l3', category: 'love', title: 'Предложение в своём месте', note: 'выбрать вместе' },
+    { id: 'ex-l4', category: 'love', title: 'Письма через 5 лет', note: 'написать друг другу' },
+    { id: 'ex-l5', category: 'love', title: '7 дней без ноутбуков', note: 'только вдвоём' },
+    { id: 'ex-l6', category: 'love', title: 'Семейный фотоальбом', note: 'за год' },
+    { id: 'ex-l7', category: 'love', title: 'Ужин для друзей во дворе', note: 'большой стол' },
+    { id: 'ex-l8', category: 'love', title: 'Поездка с родителями', note: 'туда, куда они хотели' },
+    { id: 'ex-l9', category: 'love', title: 'Стать наставником', note: 'для начинающего' },
+    { id: 'ex-l10', category: 'love', title: '10 дней без соцсетей', note: 'с близким человеком' },
+
+    { id: 'ex-c1', category: 'creativity', title: 'Написать книгу', note: 'своя история' },
+    { id: 'ex-c2', category: 'creativity', title: 'Снять короткометражку', note: '10 минут' },
+    { id: 'ex-c3', category: 'creativity', title: 'Выставка фотографий', note: 'свои лучшие кадры' },
+    { id: 'ex-c4', category: 'creativity', title: 'Научиться играть на инструменте', note: 'одна песня целиком' },
+    { id: 'ex-c5', category: 'creativity', title: 'Библиотека из 100 книг', note: 'свои, не случайные' },
+    { id: 'ex-c6', category: 'creativity', title: 'Дом у моря с мастерской', note: 'место для работы' },
+    { id: 'ex-c7', category: 'creativity', title: 'Кухня с большим столом', note: 'собираются все' },
+    { id: 'ex-c8', category: 'creativity', title: 'Посадить дерево или парк', note: 'оставить след' },
+    { id: 'ex-c9', category: 'creativity', title: 'Оплатить обучение 3 детям', note: 'не своим' },
+    { id: 'ex-c10', category: 'creativity', title: 'Годовой ритуал помощи', note: 'станет традицией' }
+  ];
+
+  const EXAMPLE_IMAGES = {
+    travel: ['scene-ski.jpg', 'scene-egypt.jpg', 'scene-turkey.jpg', 'scene-vietnam.jpg', 'scene-yacht.jpg'],
+    body: ['scene-dolzhanka.jpg', 'scene-ski.jpg', 'scene-pyatigorsk.jpg', 'scene-yacht.jpg', 'scene-vietnam.jpg'],
+    business: ['scene-business.jpg', 'scene-income.jpg'],
+    love: ['scene-love.jpg', 'scene-yacht.jpg'],
+    creativity: ['scene-vietnam.jpg', 'scene-yacht.jpg', 'scene-business.jpg', 'scene-love.jpg']
   };
 
   const BASE_BY_ID = Object.fromEntries(SEED.map((wish) => [wish.id, wish]));
@@ -43,6 +121,7 @@
   const state = {
     wishes: [],
     filter: 'all',
+    exampleFilter: 'all',
     editingId: null,
     shared: false
   };
@@ -169,7 +248,7 @@
     const id = String(raw.id || uid());
     const title = String(raw.title || '').trim().slice(0, 80);
     if (!title) return null;
-    const category = ['travel', 'business', 'love', 'dream'].includes(raw.category) ? raw.category : 'dream';
+    const category = ['travel', 'body', 'business', 'love', 'creativity', 'dream'].includes(raw.category) ? raw.category : 'dream';
     const base = BASE_BY_ID[id];
     return {
       id,
@@ -268,7 +347,7 @@
       return wish.category === filter;
     });
 
-    const cards = visible.map((wish) => {
+    const cardHtml = (wish) => {
       const media = wish.image ? `<img class="wish-media-img" src="${escapeHtml(wish.image)}" alt="" loading="lazy" decoding="async">` : '';
       const doneClass = wish.done ? ' is-done' : '';
       const stamp = wish.done ? '<span class="wish-stamp">Сбылось</span>' : '';
@@ -276,7 +355,7 @@
       return `
         <article class="wish-card${doneClass}" data-id="${escapeHtml(wish.id)}">
           <div class="wish-media${wish.image ? '' : ' no-image'}">${media}
-            <span class="wish-cat">${CATEGORY_LABEL[wish.category] || 'Мечта'}</span>
+            <span class="wish-cat">${CATEGORY_SHORT[wish.category] || 'Мечта'}</span>
             <button class="wish-check" type="button" data-check="${escapeHtml(wish.id)}" aria-pressed="${wish.done}" aria-label="${wish.done ? 'Вернуть в планы' : 'Отметить сбывшимся'}">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>
             </button>
@@ -294,7 +373,18 @@
             <p>${escapeHtml(wish.note || ' ')}</p>
           </div>
         </article>`;
-    }).join('');
+    };
+
+    let cards = '';
+    if (filter === 'all') {
+      cards = CATEGORY_ORDER.map((category, index) => {
+        const items = visible.filter((wish) => wish.category === category);
+        if (!items.length) return '';
+        return `<div class="wish-group-head"><span>${String(index + 1).padStart(2, '0')}</span><h3>${CATEGORY_LABEL[category]}</h3><small>${items.length}</small></div>${items.map(cardHtml).join('')}`;
+      }).join('');
+    } else {
+      cards = visible.map(cardHtml).join('');
+    }
 
     const addCard = state.shared ? '' : `
       <button class="wish-add-card" type="button" data-add-wish>
@@ -382,11 +472,71 @@
     });
   }
 
+  function exampleImage(example) {
+    const images = EXAMPLE_IMAGES[example.category] || EXAMPLE_IMAGES.travel;
+    const index = EXAMPLES.filter((item) => item.category === example.category).indexOf(example);
+    return `assets/img/scenes/${images[index % images.length]}`;
+  }
+
+  function renderExamples() {
+    const grid = $('#examplesGrid');
+    if (!grid) return;
+    const filter = state.exampleFilter;
+    const visible = EXAMPLES.filter((example) => filter === 'all' || example.category === filter);
+    grid.className = `wish-grid examples-grid is-${collageLayout}`;
+    grid.innerHTML = visible.map((example) => {
+      const exists = state.wishes.some((wish) => wish.title === example.title);
+      return `
+        <article class="wish-card example-card" data-example-id="${example.id}">
+          <div class="wish-media">
+            <img class="wish-media-img" src="${exampleImage(example)}" alt="${escapeHtml(example.title)}" loading="lazy" decoding="async">
+            <span class="wish-cat">${escapeHtml(CATEGORY_SHORT[example.category] || 'Мечта')}</span>
+          </div>
+          <div class="wish-body">
+            <div class="wish-body-top"><h3>${escapeHtml(example.title)}</h3></div>
+            <p>${escapeHtml(example.note)}</p>
+            <button class="example-add${exists ? ' is-added' : ''}" type="button" data-add-example="${example.id}">
+              ${exists ? 'В моей карте' : '+ В мою карту'}
+            </button>
+          </div>
+        </article>`;
+    }).join('');
+    if ($('#exampleCount')) $('#exampleCount').textContent = `${visible.length} ${plural(visible.length, 'идея', 'идеи', 'идей')}`;
+    $$('.example-filter').forEach((button) => {
+      const active = button.dataset.exampleFilter === filter;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+  }
+
+  function addExample(id) {
+    const example = EXAMPLES.find((item) => item.id === id);
+    if (!example) return;
+    if (state.wishes.some((wish) => wish.title === example.title)) {
+      showToast('Это желание уже есть в карте');
+      return;
+    }
+    state.wishes.push({
+      id: uid(),
+      title: example.title,
+      note: example.note,
+      month: 'Когда-нибудь',
+      category: example.category,
+      image: exampleImage(example),
+      done: false
+    });
+    saveLocal();
+    renderWishes();
+    renderExamples();
+    showToast(`«${example.title}» добавлено в карту`);
+  }
+
   function setCollageLayout(layout) {
     if (!COLLAGE_LAYOUTS[layout]) return;
     collageLayout = layout;
     try { localStorage.setItem(COLLAGE_KEY, layout); } catch {}
     renderWishes();
+    renderExamples();
     showToast(`Коллаж: ${COLLAGE_LAYOUTS[layout].label}`);
   }
 
@@ -1284,6 +1434,17 @@
     }
     showToast(`Сохранён вид: ${COLLAGE_LAYOUTS[collageLayout].label}`);
   });
+  $$('.example-filter').forEach((button) => {
+    button.addEventListener('click', () => {
+      state.exampleFilter = button.dataset.exampleFilter;
+      renderExamples();
+    });
+  });
+  $('#examplesGrid')?.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-add-example]');
+    if (button) addExample(button.dataset.addExample);
+  });
+
   els.imagePrompt?.addEventListener('input', saveImageDraft);
   els.imageDetails?.addEventListener('input', saveImageDraft);
   els.generateImage?.addEventListener('click', generateImage);
@@ -1326,5 +1487,6 @@
     state.wishes = loadLocal();
   }
   renderWishes();
+  renderExamples();
   setFilter('all');
 })();
