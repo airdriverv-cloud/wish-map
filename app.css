@@ -684,3 +684,129 @@ button.text-link:hover { border-color: var(--gold); }
 }
 
 .text-link.is-armed { color: #ff9a85; }
+
+/* collage variants */
+.collage-section { padding-bottom: 90px; }
+.collage-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; margin-bottom: 16px; }
+.collage-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.collage-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-family: "Manrope", sans-serif;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.collage-tab span { color: var(--gold); font-size: 9px; }
+.collage-tab:hover { color: var(--cream); border-color: rgba(201, 160, 99, 0.55); }
+.collage-tab.is-active { background: var(--gold); color: #10231d; border-color: var(--gold); }
+.collage-tab.is-active span { color: #10231d; }
+.collage-board {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 247, 235, 0.035);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+}
+.collage-item { position: relative; min-width: 0; overflow: hidden; background: #0a1a16; }
+.collage-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.8s var(--ease); }
+.collage-item:hover img { transform: scale(1.045); }
+.collage-item::after {
+  content: "";
+  position: absolute;
+  inset: 45% 0 0;
+  background: linear-gradient(transparent, rgba(4, 11, 9, 0.86));
+  pointer-events: none;
+}
+.collage-caption { position: absolute; z-index: 2; left: 10px; right: 10px; bottom: 9px; }
+.collage-caption span { display: block; color: var(--gold-light); font-size: 7px; letter-spacing: 0.15em; text-transform: uppercase; }
+.collage-caption b { display: block; margin-top: 3px; color: var(--cream); font-family: "Cormorant", Georgia, serif; font-size: 18px; font-weight: 500; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.collage-caption small { display: block; margin-top: 3px; color: var(--sand); font-size: 7px; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.collage-meta { display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; margin-top: 13px; color: var(--muted); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; }
+
+.collage-board.is-mosaic { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: 116px; grid-auto-flow: dense; }
+.collage-board.is-mosaic .collage-item:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+.collage-board.is-mosaic .collage-item:nth-child(2) { grid-column: span 2; grid-row: span 2; }
+.collage-board.is-mosaic .collage-item:nth-child(3) { grid-column: span 2; grid-row: span 1; }
+.collage-board.is-mosaic .collage-item:nth-child(4) { grid-column: span 1; grid-row: span 1; }
+.collage-board.is-mosaic .collage-item:nth-child(5) { grid-column: span 1; grid-row: span 1; }
+.collage-board.is-mosaic .collage-item:nth-child(6) { grid-column: span 2; grid-row: span 2; }
+.collage-board.is-mosaic .collage-item:nth-child(7) { grid-column: span 2; grid-row: span 1; }
+.collage-board.is-mosaic .collage-item:nth-child(8) { grid-column: span 1; grid-row: span 1; }
+.collage-board.is-mosaic .collage-item:nth-child(9) { grid-column: span 1; grid-row: span 1; }
+.collage-board.is-mosaic .collage-item:nth-child(10) { grid-column: span 2; grid-row: span 1; }
+
+.collage-board.is-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.collage-board.is-grid .collage-item { aspect-ratio: 4 / 5; }
+
+.collage-board.is-magazine { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: 108px; grid-auto-flow: dense; }
+.collage-board.is-magazine .collage-item:nth-child(1) { grid-column: span 3; grid-row: span 3; }
+.collage-board.is-magazine .collage-item:nth-child(2) { grid-column: span 3; grid-row: span 2; }
+.collage-board.is-magazine .collage-item:nth-child(3) { grid-column: span 3; grid-row: span 1; }
+.collage-board.is-magazine .collage-item:nth-child(4),
+.collage-board.is-magazine .collage-item:nth-child(5),
+.collage-board.is-magazine .collage-item:nth-child(6) { grid-column: span 2; grid-row: span 1; }
+.collage-board.is-magazine .collage-item:nth-child(7),
+.collage-board.is-magazine .collage-item:nth-child(8),
+.collage-board.is-magazine .collage-item:nth-child(9) { grid-column: span 2; grid-row: span 1; }
+.collage-board.is-magazine .collage-item:nth-child(10) { grid-column: span 2; grid-row: span 1; }
+
+.collage-board.is-strip { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 14px; }
+.collage-board.is-strip .collage-item { flex: 0 0 220px; aspect-ratio: 3 / 4; scroll-snap-align: start; }
+
+.collage-board.is-polaroid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px 14px; padding: 26px 22px 30px; background: #e8dcc8; border-color: rgba(201, 160, 99, 0.45); }
+.collage-board.is-polaroid .collage-item { padding: 8px 8px 34px; background: #fbf6ec; box-shadow: 0 14px 28px rgba(6, 15, 12, 0.28); overflow: visible; }
+.collage-board.is-polaroid .collage-item:nth-child(odd) { transform: rotate(-2deg); }
+.collage-board.is-polaroid .collage-item:nth-child(even) { transform: rotate(2deg); }
+.collage-board.is-polaroid .collage-item img { aspect-ratio: 4 / 5; height: auto; }
+.collage-board.is-polaroid .collage-item::after { display: none; }
+.collage-board.is-polaroid .collage-caption { position: static; padding: 9px 2px 0; }
+.collage-board.is-polaroid .collage-caption span { color: #9b7440; }
+.collage-board.is-polaroid .collage-caption b { color: #1a2c24; font-size: 17px; }
+.collage-board.is-polaroid .collage-caption small { color: #6b7b6d; }
+
+@media (max-width: 1000px) {
+  .collage-board.is-mosaic { grid-auto-rows: 96px; }
+  .collage-board.is-magazine { grid-auto-rows: 90px; }
+  .collage-board.is-polaroid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+  .collage-toolbar { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .collage-board.is-mosaic { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 92px; gap: 7px; padding: 7px; }
+  .collage-board.is-mosaic .collage-item:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+  .collage-board.is-mosaic .collage-item:nth-child(2) { grid-column: span 2; grid-row: span 1; }
+  .collage-board.is-mosaic .collage-item:nth-child(3) { grid-column: span 2; grid-row: span 1; }
+  .collage-board.is-mosaic .collage-item:nth-child(4) { grid-column: span 1; }
+  .collage-board.is-mosaic .collage-item:nth-child(5) { grid-column: span 1; }
+  .collage-board.is-mosaic .collage-item:nth-child(6) { grid-column: span 2; grid-row: span 2; }
+  .collage-board.is-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .collage-board.is-magazine { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 130px; }
+  .collage-board.is-magazine .collage-item:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+  .collage-board.is-magazine .collage-item:nth-child(2),
+  .collage-board.is-magazine .collage-item:nth-child(3) { grid-column: span 1; grid-row: span 1; }
+  .collage-board.is-magazine .collage-item:nth-child(n+4) { grid-column: span 1; grid-row: span 1; }
+  .collage-board.is-polaroid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 10px; padding: 18px 14px 22px; }
+  .collage-caption b { font-size: 16px; }
+  .collage-board.is-strip .collage-item { flex-basis: 190px; }
+  .collage-meta { display: block; line-height: 1.8; }
+  .collage-meta span { display: block; }
+}
+
+.collage-placeholder { display: block; width: 100%; height: 100%; min-height: 120px; background: linear-gradient(145deg, #193a30, #0a1a16 65%); }
+.collage-item.no-image .collage-caption { z-index: 2; }
+
+/* close the last row of the asymmetric layouts */
+.collage-board.is-mosaic .collage-item:nth-child(10) { grid-column: span 6; }
+.collage-board.is-magazine .collage-item:nth-child(10) { grid-column: span 6; }
+@media (max-width: 700px) {
+  .collage-board.is-mosaic .collage-item:nth-child(10) { grid-column: span 4; }
+  .collage-board.is-magazine .collage-item:nth-child(10) { grid-column: span 2; }
+}

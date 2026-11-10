@@ -5,6 +5,7 @@
 
   const STORAGE_KEY = 'wishmap-viktor-v2';
   const IMAGE_DRAFT_KEY = 'wishmap-image-drafts-v1';
+  const COLLAGE_KEY = 'wishmap-collage-layout-v1';
   const CARD_IMAGES = {
     dombay: 'assets/img/card-01.jpg',
     egypt: 'assets/img/card-02.jpg',
@@ -56,6 +57,19 @@
   let imageStyle = 'cartoon';
   const FAL_PIN = '6620';
   let falUnlocked = false;
+
+  const COLLAGE_LAYOUTS = {
+    mosaic: { label: 'Классика · угловая мозаика' },
+    grid: { label: 'Сетка · ровный ритм' },
+    magazine: { label: 'Журнал · большой кадр' },
+    strip: { label: 'Плёнка · горизонтальная лента' },
+    polaroid: { label: 'Полароиды · тёплые рамки' }
+  };
+  let collageLayout = 'mosaic';
+  try {
+    const savedCollage = localStorage.getItem(COLLAGE_KEY);
+    if (savedCollage && COLLAGE_LAYOUTS[savedCollage]) collageLayout = savedCollage;
+  } catch {}
 
   const IMAGE_STYLES = {
     cartoon: {
@@ -284,6 +298,7 @@
         : `Показано ${visible.length} из ${state.wishes.length}`;
     }
     renderRoute();
+    renderCollage();
     updateProgress();
   }
 
@@ -292,6 +307,41 @@
       const wish = state.wishes.find((item) => item.id === stop.dataset.routeId);
       stop.classList.toggle('is-done', Boolean(wish?.done));
     });
+  }
+
+  function renderCollage() {
+    const board = $('#collageBoard');
+    if (!board) return;
+    board.className = `collage-board is-${collageLayout}`;
+    board.innerHTML = state.wishes.slice(0, 10).map((wish, index) => {
+      const media = wish.image
+        ? `<img src="${escapeHtml(wish.image)}" alt="${escapeHtml(wish.title)}" loading="lazy">`
+        : '<span class="collage-placeholder" aria-hidden="true"></span>';
+      return `
+        <article class="collage-item${wish.image ? '' : ' no-image'}">
+          ${media}
+          <div class="collage-caption">
+            <span>${String(index + 1).padStart(2, '0')} · ${escapeHtml(CATEGORY_LABEL[wish.category] || 'Мечта')}</span>
+            <b>${escapeHtml(wish.title)}</b>
+            <small>${escapeHtml(wish.month || 'когда угодно')}</small>
+          </div>
+        </article>`;
+    }).join('');
+    const name = $('#collageName');
+    if (name) name.textContent = COLLAGE_LAYOUTS[collageLayout].label;
+    $$('.collage-tab').forEach((button) => {
+      const active = button.dataset.collageLayout === collageLayout;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-selected', String(active));
+    });
+  }
+
+  function setCollageLayout(layout) {
+    if (!COLLAGE_LAYOUTS[layout]) return;
+    collageLayout = layout;
+    try { localStorage.setItem(COLLAGE_KEY, layout); } catch {}
+    renderCollage();
+    showToast(`Коллаж: ${COLLAGE_LAYOUTS[layout].label}`);
   }
 
   function plural(number, one, few, many) {
@@ -1007,7 +1057,7 @@
     menuToggle?.setAttribute('aria-expanded', 'false');
   }));
 
-  const sectionIds = ['wishes', 'route', 'video-map', 'video', 'foundation', 'how'];
+  const sectionIds = ['wishes', 'route', 'collage', 'video-map', 'video', 'foundation', 'how'];
   const sections = sectionIds.map((id) => document.getElementById(id)).filter(Boolean);
   if ('IntersectionObserver' in window) {
     const navObserver = new IntersectionObserver((entries) => {
@@ -1132,6 +1182,14 @@
   els.importShared?.addEventListener('click', importShared);
   els.wishForm?.addEventListener('submit', saveWish);
   els.deleteWish?.addEventListener('click', deleteWish);
+  $$('.collage-tab').forEach((button) => {
+    button.addEventListener('click', () => setCollageLayout(button.dataset.collageLayout));
+  });
+  $('#saveCollage')?.addEventListener('click', () => {
+    try { localStorage.setItem(COLLAGE_KEY, collageLayout); } catch {}
+    showToast('Коллаж сохранён');
+  });
+
   els.imagePrompt?.addEventListener('input', saveImageDraft);
   els.imageDetails?.addEventListener('input', saveImageDraft);
   els.generateImage?.addEventListener('click', generateImage);
