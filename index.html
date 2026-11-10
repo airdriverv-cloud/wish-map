@@ -21,7 +21,7 @@
 <link rel="preload" href="assets/fonts/CormorantGaramond-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="preload" href="assets/fonts/Manrope-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="style.css?v=4">
-<link rel="stylesheet" href="app.css?v=8">
+<link rel="stylesheet" href="app.css?v=10">
 <script>document.documentElement.classList.replace('no-js','js');</script>
 </head>
 <body>
@@ -454,27 +454,16 @@
     <p class="eyebrow">Новое изображение</p>
     <h2 id="imageModalTitle">Заменить кадр</h2>
     <p class="modal-lead" id="imageWishLabel">Опиши новый кадр — сгенерируем его прямо здесь, без регистрации.</p>
-    <div class="image-modes" role="radiogroup" aria-label="Стиль изображения">
-      <button class="image-mode is-active" type="button" data-image-mode="cartoon" role="radio" aria-checked="true" title="Мультяшный кадр">
-        <b>Мульт</b><small>2D-кадр</small>
+    <p class="image-label">Способ</p>
+    <div class="image-methods" role="radiogroup" aria-label="Способ добавления изображения">
+      <button class="image-method is-active" type="button" data-image-method="find" role="radio" aria-checked="true" title="Найти готовое фото в интернете">
+        <b>Найти</b><small>в интернете</small>
       </button>
-      <button class="image-mode" type="button" data-image-mode="realistic" role="radio" aria-checked="false" title="Реалистичное фото">
-        <b>Реалити</b><small>фото</small>
+      <button class="image-method" type="button" data-image-method="local" role="radio" aria-checked="false" title="Сгенерировать на ноутбуке в ComfyUI">
+        <b>Ноут</b><small>ComfyUI</small>
       </button>
-      <button class="image-mode" type="button" data-image-mode="anime" role="radio" aria-checked="false" title="Аниме-кадр">
-        <b>Аниме</b><small>стилизация</small>
-      </button>
-      <button class="image-mode" type="button" data-image-mode="watercolor" role="radio" aria-checked="false" title="Акварельный кадр">
-        <b>Акварель</b><small>мягко</small>
-      </button>
-      <button class="image-mode" type="button" data-image-mode="neon" role="radio" aria-checked="false" title="Неоновый кадр">
-        <b>Неон</b><small>киберпанк</small>
-      </button>
-      <button class="image-mode" type="button" data-image-mode="render3d" role="radio" aria-checked="false" title="3D-кадр">
-        <b>3D</b><small>объём</small>
-      </button>
-      <button class="image-mode fal-mode" type="button" data-image-mode="fal" role="radio" aria-checked="false" title="FAL-генерация по PIN">
-        <b>FAL</b><small>PIN</small>
+      <button class="image-method" type="button" data-image-method="fal" role="radio" aria-checked="false" title="Сгенерировать через FAL по PIN">
+        <b>FAL</b><small>PIN 6620</small>
       </button>
     </div>
 
@@ -489,6 +478,29 @@
       </div>
       <p class="micro" id="falPinStatus">PIN спрашивается один раз за сессию.</p>
     </div>
+
+    <p class="image-label">Вид</p>
+    <div class="image-styles" role="radiogroup" aria-label="Вид изображения">
+      <button class="image-style is-active" type="button" data-image-style="cartoon" role="radio" aria-checked="true">
+        <b>Мульт</b><small>2D-кадр</small>
+      </button>
+      <button class="image-style" type="button" data-image-style="realistic" role="radio" aria-checked="false">
+        <b>Реалити</b><small>фото</small>
+      </button>
+      <button class="image-style" type="button" data-image-style="anime" role="radio" aria-checked="false">
+        <b>Аниме</b><small>стилизация</small>
+      </button>
+      <button class="image-style" type="button" data-image-style="watercolor" role="radio" aria-checked="false">
+        <b>Акварель</b><small>мягко</small>
+      </button>
+      <button class="image-style" type="button" data-image-style="neon" role="radio" aria-checked="false">
+        <b>Неон</b><small>киберпанк</small>
+      </button>
+      <button class="image-style" type="button" data-image-style="render3d" role="radio" aria-checked="false">
+        <b>3D</b><small>объём</small>
+      </button>
+    </div>
+
     <label class="field">
       <span>Что должно быть на кадре?</span>
       <textarea id="imagePrompt" maxlength="500" rows="3" placeholder="Например: пара на яхте в бирюзовой бухте, тёплый закат, без текста"></textarea>
@@ -529,6 +541,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
 
-<script src="script.js?v=11" defer></script>
+<script src="script.js?v=13" defer></script>
 </body>
 </html>

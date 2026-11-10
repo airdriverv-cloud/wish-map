@@ -47,12 +47,13 @@
   let toastTimer = null;
   let lastFocused = null;
   let imageWishId = null;
-  let imageMode = 'cartoon';
+  let imageMethod = 'find';
+  let imageStyle = 'cartoon';
   const FAL_PIN = '6620';
   let falUnlocked = false;
   try { falUnlocked = sessionStorage.getItem('wishmap-fal-unlocked') === '1'; } catch {}
 
-  const IMAGE_MODES = {
+  const IMAGE_STYLES = {
     cartoon: {
       label: 'Мульт',
       placeholder: 'Например: пара на яхте в бирюзовой бухте, тёплый закат',
@@ -82,12 +83,13 @@
       label: '3D',
       placeholder: 'Например: уютный дом у моря, пластилиновый стиль',
       style: 'stylized 3D render, soft clay materials, cinematic depth of field, warm studio light'
-    },
-    fal: {
-      label: 'FAL',
-      placeholder: 'Опиши кадр для FAL: кто, где, свет, настроение',
-      style: 'premium cinematic illustration, rich detail, dramatic lighting, refined color grade'
     }
+  };
+
+  const IMAGE_METHODS = {
+    find: { label: 'Найти', button: 'Найти кадр' },
+    local: { label: 'Ноут', button: 'Сгенерировать' },
+    fal: { label: 'FAL', button: 'FAL-кадр' }
   };
 
   const els = {
@@ -412,29 +414,50 @@
   }
 
   /* ---------- image generation (no account) ---------- */
-  function setImageMode(mode) {
-    if (!IMAGE_MODES[mode]) return;
-    if (mode === 'fal' && !falUnlocked) {
+  function generateLabel() {
+    return IMAGE_METHODS[imageMethod]?.button || 'Сделать кадр';
+  }
+
+  function updateGenerateButton() {
+    if (els.generateImage && !els.generateImage.disabled) {
+      els.generateImage.textContent = generateLabel();
+    }
+  }
+
+  function setImageMethod(method) {
+    if (!IMAGE_METHODS[method]) return;
+    if (method === 'fal' && !falUnlocked) {
       if (els.falPinPanel) els.falPinPanel.hidden = false;
       if (els.falPinStatus) {
         els.falPinStatus.textContent = 'Введи PIN, чтобы открыть FAL-генерацию.';
         els.falPinStatus.classList.remove('is-error');
       }
-      $$('.image-mode').forEach((button) => {
+      $$('.image-method').forEach((button) => {
         button.classList.remove('is-active');
         button.setAttribute('aria-checked', 'false');
       });
       window.setTimeout(() => els.falPin?.focus(), 60);
       return;
     }
-    imageMode = mode;
-    $$('.image-mode').forEach((button) => {
-      const active = button.dataset.imageMode === mode;
+    imageMethod = method;
+    $$('.image-method').forEach((button) => {
+      const active = button.dataset.imageMethod === method;
       button.classList.toggle('is-active', active);
       button.setAttribute('aria-checked', String(active));
     });
-    if (els.imagePrompt) els.imagePrompt.placeholder = IMAGE_MODES[mode].placeholder;
     if (els.falPinPanel) els.falPinPanel.hidden = true;
+    updateGenerateButton();
+  }
+
+  function setImageStyle(style) {
+    if (!IMAGE_STYLES[style]) return;
+    imageStyle = style;
+    $$('.image-style').forEach((button) => {
+      const active = button.dataset.imageStyle === style;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-checked', String(active));
+    });
+    if (els.imagePrompt) els.imagePrompt.placeholder = IMAGE_STYLES[style].placeholder;
   }
 
   function unlockFal() {
@@ -454,7 +477,7 @@
       els.falPinStatus.textContent = 'FAL открыт. Теперь можно генерировать.';
       els.falPinStatus.classList.remove('is-error');
     }
-    setImageMode('fal');
+    setImageMethod('fal');
     showToast('FAL-режим открыт');
   }
 
@@ -467,17 +490,18 @@
     if (!wish) return;
     imageWishId = id;
     if (els.imageWishLabel) {
-      els.imageWishLabel.innerHTML = `Желание: <b>${escapeHtml(wish.title)}</b>. Опиши новый кадр — сгенерируем без регистрации.`;
+      els.imageWishLabel.innerHTML = `Желание: <b>${escapeHtml(wish.title)}</b>. Выбери способ, вид и опиши кадр.`;
     }
     if (els.imagePrompt) els.imagePrompt.value = '';
     if (els.imageDetails) els.imageDetails.value = '';
     if (els.imageStatus) {
-      els.imageStatus.textContent = 'Без аккаунта. Опиши кадр — подберу фото или сгенерирую.';
+      els.imageStatus.textContent = 'Без аккаунта. Найти, сгенерировать на ноутбуке или через FAL.';
       els.imageStatus.classList.remove('is-error');
     }
     if (els.falPinPanel) els.falPinPanel.hidden = true;
     if (els.falPin) els.falPin.value = '';
-    setImageMode('cartoon');
+    setImageMethod('find');
+    setImageStyle('cartoon');
     openModal(els.imageModal);
     window.setTimeout(() => els.imagePrompt?.focus(), 80);
   }
@@ -573,7 +597,7 @@
   function setGenerateBusy(busy, text) {
     if (els.generateImage) {
       els.generateImage.disabled = busy;
-      els.generateImage.textContent = busy ? 'Ищу кадр…' : 'Сгенерировать';
+      els.generateImage.textContent = busy ? (imageMethod === 'find' ? 'Ищу кадр…' : 'Генерирую…') : generateLabel();
     }
     if (els.imageStatus && text) {
       els.imageStatus.textContent = text;
@@ -581,7 +605,27 @@
     }
   }
 
-  async function generateWithFal(prompt) {
+  async function localGenerate(prompt) {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), 90000);
+    try {
+      const response = await fetch('http://127.0.0.1:8190/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
+        signal: controller.signal
+      });
+      if (!response.ok) throw new Error('local bridge ' + response.status);
+      const data = await response.json();
+      if (!data?.url) throw new Error('local no image');
+      await loadImage(data.url, 30000);
+      return data.url;
+    } finally {
+      window.clearTimeout(timer);
+    }
+  }
+
+  async function falGenerate(prompt) {
     const controller = new AbortController();
     const timer = window.setTimeout(() => controller.abort(), 90000);
     try {
@@ -601,6 +645,34 @@
     }
   }
 
+  function buildImageRequestText() {
+    const wish = state.wishes.find((item) => item.id === imageWishId);
+    return [
+      'Описание нового кадра',
+      `Желание: ${wish?.title || '—'}`,
+      `Способ: ${IMAGE_METHODS[imageMethod].label}`,
+      `Вид: ${IMAGE_STYLES[imageStyle].label}`,
+      `Промпт: ${els.imagePrompt?.value.trim() || '—'}`,
+      els.imageDetails?.value.trim() ? `Детали: ${els.imageDetails.value.trim()}` : ''
+    ].filter(Boolean).join('\n');
+  }
+
+  async function copyText(text, successMessage) {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const scratch = document.createElement('textarea');
+      scratch.value = text;
+      scratch.style.position = 'fixed';
+      scratch.style.opacity = '0';
+      document.body.appendChild(scratch);
+      scratch.select();
+      document.execCommand('copy');
+      scratch.remove();
+    }
+    showToast(successMessage);
+  }
+
   async function generateImage() {
     const prompt = els.imagePrompt?.value.trim() || '';
     if (!prompt) {
@@ -608,39 +680,45 @@
       els.imagePrompt?.focus();
       return;
     }
-    if (imageMode === 'fal' && !falUnlocked) {
-      setImageMode('fal');
+    if (imageMethod === 'fal' && !falUnlocked) {
+      setImageMethod('fal');
       return;
     }
     const wish = state.wishes.find((item) => item.id === imageWishId);
     if (!wish) return;
 
     const details = els.imageDetails?.value.trim() || '';
-    const mode = IMAGE_MODES[imageMode];
-    setGenerateBusy(true, imageMode === 'fal' ? 'FAL генерирует кадр…' : 'Без аккаунта. Ищу или генерирую кадр…');
+    const style = IMAGE_STYLES[imageStyle];
+    const method = IMAGE_METHODS[imageMethod];
+    setGenerateBusy(true, imageMethod === 'find'
+      ? 'Ищу кадр в интернете…'
+      : `${method.label} генерирует кадр…`);
 
     let imageUrl = null;
     let used = '';
-
     const english = await translateToEnglish([prompt, details].filter(Boolean).join('. '));
-    const fullPrompt = [
-      english,
-      mode.style,
-      'vertical 4:5 composition, no text, no letters, no watermark, no logo'
-    ].filter(Boolean).join('. ');
+    const fullPrompt = [english, style.style, 'vertical 4:5 composition, no text, no letters, no watermark, no logo']
+      .filter(Boolean).join('. ');
 
-    if (imageMode === 'fal') {
+    if (imageMethod === 'local') {
       try {
-        imageUrl = await generateWithFal(fullPrompt);
-        used = 'fal';
+        imageUrl = await localGenerate(fullPrompt);
+        used = 'local';
       } catch {
-        if (els.imageStatus) {
-          els.imageStatus.textContent = 'FAL-мост не ответил — генерирую резервный кадр…';
-        }
+        if (els.imageStatus) els.imageStatus.textContent = 'Ноут-мост не ответил — генерирую резервно…';
       }
     }
 
-    if (!imageUrl && imageMode !== 'realistic') {
+    if (imageMethod === 'fal') {
+      try {
+        imageUrl = await falGenerate(fullPrompt);
+        used = 'fal';
+      } catch {
+        if (els.imageStatus) els.imageStatus.textContent = 'FAL-мост не ответил — генерирую резервно…';
+      }
+    }
+
+    if (!imageUrl && imageMethod !== 'find') {
       try {
         const seed = Math.floor(Math.random() * 1_000_000_000);
         const candidate = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(fullPrompt) +
@@ -669,10 +747,11 @@
     renderWishes();
     setGenerateBusy(false);
     closeModal(els.imageModal);
-    if (used === 'fal') showToast('FAL-кадр готов — PIN принят');
-    else if (used === 'generated') showToast('Новый кадр сгенерирован — без регистрации');
-    else if (used === 'photo') showToast('Подобрал новый кадр — без регистрации');
-    else showToast('Поставил кадр из коллекции — без регистрации');
+    if (used === 'local') showToast('Ноут сгенерировал кадр');
+    else if (used === 'fal') showToast('FAL-кадр готов — PIN принят');
+    else if (used === 'generated') showToast('Резервный кадр сгенерирован');
+    else if (used === 'photo') showToast('Нашёл новый кадр в интернете');
+    else showToast('Поставил кадр из коллекции');
   }
 
   function copyImageRequest() {
@@ -988,8 +1067,11 @@
     }
   });
   els.copyImageRequest?.addEventListener('click', copyImageRequest);
-  $$('.image-mode').forEach((button) => {
-    button.addEventListener('click', () => setImageMode(button.dataset.imageMode));
+  $$('.image-method').forEach((button) => {
+    button.addEventListener('click', () => setImageMethod(button.dataset.imageMethod));
+  });
+  $$('.image-style').forEach((button) => {
+    button.addEventListener('click', () => setImageStyle(button.dataset.imageStyle));
   });
 
   $$('.filter').forEach((button) => button.addEventListener('click', () => setFilter(button.dataset.filter)));
