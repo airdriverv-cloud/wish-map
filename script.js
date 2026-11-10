@@ -61,8 +61,6 @@
   const COLLAGE_LAYOUTS = {
     mosaic: { label: 'Классика · угловая мозаика' },
     grid: { label: 'Сетка · ровный ритм' },
-    magazine: { label: 'Журнал · большой кадр' },
-    strip: { label: 'Плёнка · горизонтальная лента' },
     polaroid: { label: 'Полароиды · тёплые рамки' }
   };
   let collageLayout = 'mosaic';
@@ -329,10 +327,11 @@
     }).join('');
     const name = $('#collageName');
     if (name) name.textContent = COLLAGE_LAYOUTS[collageLayout].label;
-    $$('.collage-tab').forEach((button) => {
+    $$('.collage-tab, .collage-quick-tab').forEach((button) => {
       const active = button.dataset.collageLayout === collageLayout;
       button.classList.toggle('is-active', active);
       button.setAttribute('aria-selected', String(active));
+      button.setAttribute('aria-pressed', String(active));
     });
   }
 
@@ -1182,7 +1181,7 @@
   els.importShared?.addEventListener('click', importShared);
   els.wishForm?.addEventListener('submit', saveWish);
   els.deleteWish?.addEventListener('click', deleteWish);
-  $$('.collage-tab').forEach((button) => {
+  $$('.collage-tab, .collage-quick-tab').forEach((button) => {
     button.addEventListener('click', () => setCollageLayout(button.dataset.collageLayout));
   });
   $('#saveCollage')?.addEventListener('click', () => {

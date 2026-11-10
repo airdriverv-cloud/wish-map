@@ -21,7 +21,7 @@
 <link rel="preload" href="assets/fonts/CormorantGaramond-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/Manrope-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css?v=23">
-<link rel="stylesheet" href="app.css?v=23">
+<link rel="stylesheet" href="app.css?v=24">
 <script>document.documentElement.classList.replace('no-js','js');</script>
 </head>
 <body>
@@ -142,6 +142,14 @@
         <p class="wish-count" id="wishCount">10 желаний</p>
       </div>
 
+      <div class="collage-quick reveal" aria-label="Вариант коллажа">
+        <span class="collage-quick-label">Коллаж</span>
+        <button class="collage-quick-tab is-active" type="button" data-collage-layout="mosaic" aria-pressed="true">Классика</button>
+        <button class="collage-quick-tab" type="button" data-collage-layout="grid" aria-pressed="false">Сетка</button>
+        <button class="collage-quick-tab" type="button" data-collage-layout="polaroid" aria-pressed="false">Полароиды</button>
+        <a class="collage-quick-link" href="#collage">открыть <span aria-hidden="true">↗</span></a>
+      </div>
+
       <div class="wish-grid" id="wishGrid" aria-live="polite"></div>
       <div class="wish-empty" id="wishEmpty" hidden>
         <p>Здесь пока пусто. Добавь желание, которое хочется прожить.</p>
@@ -209,7 +217,7 @@
       <div class="section-head">
         <div>
           <p class="eyebrow reveal">03 / Коллаж</p>
-          <h2 class="reveal">Одна карта.<br><em>Пять композиций.</em></h2>
+          <h2 class="reveal">Одна карта.<br><em>Три композиции.</em></h2>
         </div>
         <p class="section-note reveal">Текущий коллаж сохранён как «Классика». Выбери другой вариант — он запомнится в браузере.</p>
       </div>
@@ -218,9 +226,7 @@
         <div class="collage-tabs" role="tablist" aria-label="Вариант коллажа">
           <button class="collage-tab is-active" type="button" data-collage-layout="mosaic" role="tab" aria-selected="true"><span>01</span>Классика</button>
           <button class="collage-tab" type="button" data-collage-layout="grid" role="tab" aria-selected="false"><span>02</span>Сетка</button>
-          <button class="collage-tab" type="button" data-collage-layout="magazine" role="tab" aria-selected="false"><span>03</span>Журнал</button>
-          <button class="collage-tab" type="button" data-collage-layout="strip" role="tab" aria-selected="false"><span>04</span>Плёнка</button>
-          <button class="collage-tab" type="button" data-collage-layout="polaroid" role="tab" aria-selected="false"><span>05</span>Полароиды</button>
+          <button class="collage-tab" type="button" data-collage-layout="polaroid" role="tab" aria-selected="false"><span>03</span>Полароиды</button>
         </div>
         <button class="text-link" type="button" id="saveCollage">Сохранить выбор <span aria-hidden="true">↓</span></button>
       </div>
@@ -228,7 +234,7 @@
       <div class="collage-board is-mosaic reveal" id="collageBoard" role="tabpanel" aria-live="polite"></div>
       <div class="collage-meta reveal">
         <span id="collageName">Классика · угловая мозаика</span>
-        <span>10 кадров · выбор сохраняется</span>
+        <span>10 кадров · 3 варианта</span>
       </div>
     </div>
   </section>
@@ -571,6 +577,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
 
-<script src="script.js?v=25" defer></script>
+<script src="script.js?v=26" defer></script>
 </body>
 </html>

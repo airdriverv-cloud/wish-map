@@ -762,7 +762,7 @@ button.text-link:hover { border-color: var(--gold); }
 .collage-board.is-strip { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 14px; }
 .collage-board.is-strip .collage-item { flex: 0 0 220px; aspect-ratio: 3 / 4; scroll-snap-align: start; }
 
-.collage-board.is-polaroid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px 14px; padding: 26px 22px 30px; background: #e8dcc8; border-color: rgba(201, 160, 99, 0.45); }
+.collage-board.is-polaroid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px 14px; padding: 26px 22px 30px; background: transparent; border-color: var(--line); }
 .collage-board.is-polaroid .collage-item { padding: 8px 8px 34px; background: #fbf6ec; box-shadow: 0 14px 28px rgba(6, 15, 12, 0.28); overflow: visible; }
 .collage-board.is-polaroid .collage-item:nth-child(odd) { transform: rotate(-2deg); }
 .collage-board.is-polaroid .collage-item:nth-child(even) { transform: rotate(2deg); }
@@ -814,3 +814,51 @@ button.text-link:hover { border-color: var(--gold); }
 .wish-media-img { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .wish-media::after { z-index: 1; }
 .wish-cat, .wish-check, .wish-stamp, .wish-month, .wish-replace { z-index: 2; }
+
+
+/* compact collage selector under filters */
+.collage-quick {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin: -8px 0 20px;
+  padding-top: 11px;
+  border-top: 1px solid var(--line-soft);
+}
+.collage-quick-label {
+  margin-right: 3px;
+  color: var(--muted);
+  font-size: 7px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.collage-quick-tab {
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-family: "Manrope", sans-serif;
+  font-size: 7px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.collage-quick-tab:hover { color: var(--cream); border-color: rgba(201, 160, 99, 0.55); }
+.collage-quick-tab.is-active { background: var(--gold); border-color: var(--gold); color: #10231d; }
+.collage-quick-link {
+  margin-left: auto;
+  color: var(--gold-light);
+  font-size: 7px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 2px;
+}
+.collage-quick-link:hover { color: var(--cream); border-color: var(--gold); }
+@media (max-width: 620px) {
+  .collage-quick { gap: 5px; }
+  .collage-quick-tab { padding: 5px 7px; font-size: 6px; }
+  .collage-quick-link { margin-left: 0; }
+}
