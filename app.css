@@ -979,3 +979,23 @@ button.text-link:hover { border-color: var(--gold); }
 .wish-group-head h3 { margin: 0; color: var(--cream); font-family: "Cormorant", Georgia, serif; font-size: 30px; font-weight: 500; line-height: 1; }
 .wish-group-head small { color: var(--muted); font-size: 8px; letter-spacing: 0.12em; }
 .wish-grid.is-polaroid .wish-group-head h3 { color: var(--cream); }
+
+/* generated image gallery */
+.image-gallery-wrap { margin: 0 0 18px; padding-top: 14px; border-top: 1px solid var(--line-soft); }
+.image-gallery-wrap .eyebrow { margin-bottom: 10px; }
+.image-gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.gallery-item { position: relative; margin: 0; border: 1px solid var(--line); background: #07130f; overflow: hidden; }
+.gallery-item.is-current { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+.gallery-item img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; }
+.gallery-item figcaption { display: flex; align-items: center; gap: 4px; padding: 4px; }
+.gallery-use, .gallery-delete { border: 1px solid var(--line); background: transparent; color: var(--muted); font-family: "Manrope", sans-serif; font-size: 6px; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 5px; cursor: pointer; }
+.gallery-use { flex: 1; color: var(--gold-light); }
+.gallery-use:hover { background: var(--gold); color: #10231d; }
+.gallery-delete { flex: 0 0 auto; color: #b96955; }
+.gallery-delete:hover { border-color: #b96955; color: #ffb29f; }
+.image-count-row { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 14px; align-items: end; margin: 0 0 16px; }
+.image-count-row .micro { margin: 0 0 4px; }
+@media (max-width: 620px) {
+  .image-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .image-count-row { grid-template-columns: 1fr; gap: 0; }
+}

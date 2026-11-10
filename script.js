@@ -223,6 +223,9 @@
     imageWishLabel: $('#imageWishLabel'),
     imagePrompt: $('#imagePrompt'),
     imageDetails: $('#imageDetails'),
+    imageCount: $('#imageCount'),
+    imageGallery: $('#imageGallery'),
+    imageGalleryWrap: $('#imageGalleryWrap'),
     generateImage: $('#generateImage'),
     imageStatus: $('#imageStatus'),
     falPinPanel: $('#falPinPanel'),
@@ -259,6 +262,7 @@
       month: String(raw.month || '').slice(0, 50),
       category,
       image: typeof raw.image === 'string' && raw.image ? raw.image : (base ? base.image : ''),
+      gallery: Array.isArray(raw.gallery) ? raw.gallery.filter((item) => typeof item === 'string').slice(0, 30) : [],
       done: Boolean(raw.done)
     };
   }
@@ -354,6 +358,8 @@
       const doneClass = wish.done ? ' is-done' : '';
       const stamp = wish.done ? '<span class="wish-stamp">Сбылось</span>' : '';
       const edit = state.shared ? '' : `<button class="wish-edit" type="button" data-edit="${escapeHtml(wish.id)}" aria-label="Редактировать желание">✎</button>`;
+      const galleryCount = Array.isArray(wish.gallery) ? wish.gallery.length : 0;
+      const replaceLabel = galleryCount > 1 ? `Кадры · ${galleryCount}` : 'Заменить';
       return `
         <article class="wish-card${doneClass}" data-id="${escapeHtml(wish.id)}">
           <div class="wish-media${wish.image ? '' : ' no-image'}">${media}
@@ -363,8 +369,8 @@
             </button>
             ${stamp}
             <span class="wish-month">${escapeHtml(wish.month || 'Когда угодно')}</span>
-            ${state.shared ? '' : `<button class="wish-replace" type="button" data-replace="${escapeHtml(wish.id)}" aria-label="Заменить изображение">
-              <span aria-hidden="true">✦</span> <span class="replace-label">Заменить</span>
+            ${state.shared ? '' : `<button class="wish-replace" type="button" data-replace="${escapeHtml(wish.id)}" aria-label="Кадры желания">
+              <span aria-hidden="true">✦</span> <span class="replace-label">${replaceLabel}</span>
             </button>`}
           </div>
           <div class="wish-body">
@@ -799,6 +805,8 @@
     const wish = state.wishes.find((item) => item.id === id);
     if (!wish) return;
     imageWishId = id;
+    ensureGallery(wish);
+    renderGallery();
     if (els.imageWishLabel) {
       els.imageWishLabel.innerHTML = `Желание: <b>${escapeHtml(wish.title)}</b>. Выбери способ, вид и опиши кадр.`;
     }
@@ -871,6 +879,29 @@
       };
       image.src = url;
     });
+  }
+
+  async function compactImage(url) {
+    if (!url || !url.startsWith('data:image/')) return url;
+    try {
+      const image = new Image();
+      await new Promise((resolve, reject) => {
+        image.onload = resolve;
+        image.onerror = reject;
+        image.src = url;
+      });
+      const canvas = document.createElement('canvas');
+      canvas.width = 640;
+      canvas.height = 800;
+      const ctx = canvas.getContext('2d');
+      const scale = Math.max(640 / image.width, 800 / image.height);
+      const w = image.width * scale;
+      const h = image.height * scale;
+      ctx.drawImage(image, (640 - w) / 2, (800 - h) / 2, w, h);
+      return canvas.toDataURL('image/jpeg', 0.82);
+    } catch {
+      return url;
+    }
   }
 
   async function findCommonsImage(query) {
@@ -1034,32 +1065,36 @@
     showToast(successMessage);
   }
 
-  async function generateImage() {
-    const prompt = els.imagePrompt?.value.trim() || '';
-    if (!prompt) {
-      showToast('Опиши, что должно быть на кадре');
-      els.imagePrompt?.focus();
-      return;
-    }
-    if (imageMethod === 'fal' && !falUnlocked) {
-      setImageMethod('fal');
-      return;
-    }
+  function ensureGallery(wish) {
+    if (!Array.isArray(wish.gallery)) wish.gallery = [];
+    if (wish.image && !wish.gallery.includes(wish.image)) wish.gallery.unshift(wish.image);
+    wish.gallery = [...new Set(wish.gallery)].slice(0, 30);
+  }
+
+  function renderGallery() {
+    const wrap = $('#imageGalleryWrap');
+    const grid = $('#imageGallery');
+    if (!wrap || !grid) return;
     const wish = state.wishes.find((item) => item.id === imageWishId);
-    if (!wish) return;
+    if (!wish || !wish.gallery?.length) {
+      wrap.hidden = true;
+      grid.innerHTML = '';
+      return;
+    }
+    wrap.hidden = false;
+    grid.innerHTML = wish.gallery.map((url, index) => `
+      <figure class="gallery-item${url === wish.image ? ' is-current' : ''}">
+        <img src="${escapeHtml(url)}" alt="" loading="lazy" decoding="async">
+        <figcaption>
+          <button class="gallery-use" type="button" data-gallery-use="${index}">${url === wish.image ? 'Стоит' : 'Поставить'}</button>
+          <button class="gallery-delete" type="button" data-gallery-delete="${index}" aria-label="Удалить кадр">×</button>
+        </figcaption>
+      </figure>`).join('');
+  }
 
-    const details = els.imageDetails?.value.trim() || '';
-    const style = IMAGE_STYLES[imageStyle];
-    const method = IMAGE_METHODS[imageMethod];
-    setGenerateBusy(true, imageMethod === 'find'
-      ? 'Ищу кадр в интернете…'
-      : `${method.label} генерирует кадр…`);
-
+  async function generateSingle(fullPrompt, prompt, details, wish) {
     let imageUrl = null;
     let used = '';
-    const english = await translateToEnglish([prompt, details].filter(Boolean).join('. '));
-    const fullPrompt = [english, style.style, 'vertical 4:5 composition, no text, no letters, no watermark, no logo']
-      .filter(Boolean).join('. ');
 
     if (imageMethod === 'local') {
       try {
@@ -1067,7 +1102,7 @@
         imageUrl = local.url;
         used = local.via;
       } catch {
-        if (els.imageStatus) els.imageStatus.textContent = 'Ноут недоступен — генерирую резервно…';
+        imageUrl = null;
       }
     }
 
@@ -1076,7 +1111,7 @@
         imageUrl = await falGenerate(fullPrompt);
         used = 'fal';
       } catch {
-        if (els.imageStatus) els.imageStatus.textContent = 'FAL-мост не ответил — генерирую резервно…';
+        imageUrl = null;
       }
     }
 
@@ -1103,20 +1138,70 @@
         used = 'fallback';
       }
     }
+    return { url: imageUrl, used };
+  }
+
+  async function generateImage() {
+    const prompt = els.imagePrompt?.value.trim() || '';
+    if (!prompt) {
+      showToast('Опиши, что должно быть на кадре');
+      els.imagePrompt?.focus();
+      return;
+    }
+    if (imageMethod === 'fal' && !falUnlocked) {
+      setImageMethod('fal');
+      return;
+    }
+    const wish = state.wishes.find((item) => item.id === imageWishId);
+    if (!wish) return;
+    ensureGallery(wish);
+
+    const details = els.imageDetails?.value.trim() || '';
+    const style = IMAGE_STYLES[imageStyle];
+    const count = Math.min(10, Math.max(1, Number(els.imageCount?.value) || 1));
+    setGenerateBusy(true, imageMethod === 'find' ? 'Ищу кадры…' : 'Генерирую кадры…');
+
+    const english = await translateToEnglish([prompt, details].filter(Boolean).join('. '));
+    const fullPrompt = [english, style.style, 'vertical 4:5 composition, no text, no letters, no watermark, no logo']
+      .filter(Boolean).join('. ');
+
+    const results = [];
+    for (let index = 0; index < count; index += 1) {
+      if (els.imageStatus) {
+        els.imageStatus.textContent = `Генерирую ${index + 1} из ${count}…`;
+        els.imageStatus.classList.remove('is-error');
+      }
+      try {
+        const result = await generateSingle(fullPrompt, prompt, details, wish);
+        if (result?.url) results.push(result);
+      } catch {
+        // пробуем следующий вариант
+      }
+    }
+
+    if (!results.length) {
+      setGenerateBusy(false);
+      if (els.imageStatus) {
+        els.imageStatus.textContent = 'Не получилось получить ни один кадр. Попробуй ещё раз.';
+        els.imageStatus.classList.add('is-error');
+      }
+      showToast('Кадры не получились');
+      return;
+    }
 
     saveImageDraft();
     if (imageMethod === 'fal') falUnlocked = false;
-    wish.image = imageUrl;
+    wish.gallery = [...new Set([...results.map((item) => item.url), ...(wish.gallery || [])])].slice(0, 30);
+    wish.image = results[0].url;
     saveLocal();
     renderWishes();
+    renderGallery();
     setGenerateBusy(false);
-    closeModal(els.imageModal);
-    if (used === 'local') showToast('Ноут сгенерировал кадр');
-    else if (used === 'remote') showToast('Удалённый Ноут сгенерировал кадр');
-    else if (used === 'fal') showToast('FAL-кадр готов — PIN принят');
-    else if (used === 'generated') showToast('Резервный кадр сгенерирован');
-    else if (used === 'photo') showToast('Нашёл новый кадр в интернете');
-    else showToast('Поставил кадр из коллекции');
+    if (els.imageStatus) {
+      els.imageStatus.textContent = `Готово: ${results.length}. Выбери кадр из галереи.`;
+      els.imageStatus.classList.remove('is-error');
+    }
+    showToast(`Добавлено вариантов: ${results.length}`);
   }
 
   function copyImageRequest() {
@@ -1488,6 +1573,35 @@
   $('#examplesGrid')?.addEventListener('click', (event) => {
     const button = event.target.closest('[data-add-example]');
     if (button) addExample(button.dataset.addExample);
+  });
+
+  $('#imageGallery')?.addEventListener('click', (event) => {
+    const use = event.target.closest('[data-gallery-use]');
+    const remove = event.target.closest('[data-gallery-delete]');
+    const wish = state.wishes.find((item) => item.id === imageWishId);
+    if (!wish) return;
+    if (use) {
+      const index = Number(use.dataset.galleryUse);
+      if (wish.gallery?.[index]) {
+        wish.image = wish.gallery[index];
+        saveLocal();
+        renderWishes();
+        renderGallery();
+        showToast('Кадр выбран');
+      }
+      return;
+    }
+    if (remove) {
+      const index = Number(remove.dataset.galleryDelete);
+      const removed = wish.gallery?.[index];
+      if (!removed) return;
+      wish.gallery.splice(index, 1);
+      if (wish.image === removed) wish.image = wish.gallery[0] || '';
+      saveLocal();
+      renderWishes();
+      renderGallery();
+      showToast('Кадр удалён');
+    }
   });
 
   els.imagePrompt?.addEventListener('input', saveImageDraft);

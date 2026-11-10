@@ -21,7 +21,7 @@
 <link rel="preload" href="assets/fonts/CormorantGaramond-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/Manrope-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css?v=24">
-<link rel="stylesheet" href="app.css?v=33">
+<link rel="stylesheet" href="app.css?v=35">
 <script>document.documentElement.classList.replace('no-js','js');</script>
 </head>
 <body>
@@ -515,6 +515,24 @@
       <span>Детали (необязательно)</span>
       <input id="imageDetails" type="text" maxlength="120" placeholder="Ракурс, настроение, одежда">
     </label>
+    <div class="image-gallery-wrap" id="imageGalleryWrap" hidden>
+      <p class="eyebrow">Мои кадры</p>
+      <div class="image-gallery" id="imageGallery"></div>
+    </div>
+
+    <div class="image-count-row">
+      <label class="field">
+        <span>Сколько вариантов</span>
+        <select id="imageCount">
+          <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+          <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+          <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+          <option value="10">10</option>
+        </select>
+      </label>
+      <p class="micro" id="imageCountHint">1–10 кадров. Локальный «Ноут» генерирует их по очереди.</p>
+    </div>
+
     <div class="modal-actions">
       <button class="text-link" type="button" id="copyImageRequest">Скопировать описание</button>
       <span class="modal-spacer"></span>
@@ -547,6 +565,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
 
-<script src="script.js?v=35" defer></script>
+<script src="script.js?v=38" defer></script>
 </body>
 </html>
