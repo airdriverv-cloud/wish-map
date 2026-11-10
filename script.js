@@ -53,7 +53,6 @@
   let imageStyle = 'cartoon';
   const FAL_PIN = '6620';
   let falUnlocked = false;
-  try { falUnlocked = sessionStorage.getItem('wishmap-fal-unlocked') === '1'; } catch {}
 
   const IMAGE_STYLES = {
     cartoon: {
@@ -464,6 +463,7 @@
       return;
     }
     imageMethod = method;
+    if (method !== 'fal') falUnlocked = false;
     $$('.image-method').forEach((button) => {
       const active = button.dataset.imageMethod === method;
       button.classList.toggle('is-active', active);
@@ -496,7 +496,6 @@
       return;
     }
     falUnlocked = true;
-    try { sessionStorage.setItem('wishmap-fal-unlocked', '1'); } catch {}
     if (els.falPinStatus) {
       els.falPinStatus.textContent = 'FAL открыт. Теперь можно генерировать.';
       els.falPinStatus.classList.remove('is-error');
@@ -522,6 +521,7 @@
       els.imageStatus.textContent = 'Без аккаунта. Найти, сгенерировать на ноутбуке или через FAL.';
       els.imageStatus.classList.remove('is-error');
     }
+    falUnlocked = false;
     if (els.falPinPanel) els.falPinPanel.hidden = true;
     if (els.falPin) els.falPin.value = '';
     setImageMethod('find');
@@ -766,6 +766,7 @@
       }
     }
 
+    if (imageMethod === 'fal') falUnlocked = false;
     wish.image = imageUrl;
     saveLocal();
     renderWishes();
