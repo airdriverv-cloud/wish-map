@@ -810,3 +810,7 @@ button.text-link:hover { border-color: var(--gold); }
   .collage-board.is-mosaic .collage-item:nth-child(10) { grid-column: span 4; }
   .collage-board.is-magazine .collage-item:nth-child(10) { grid-column: span 2; }
 }
+
+.wish-media-img { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.wish-media::after { z-index: 1; }
+.wish-cat, .wish-check, .wish-stamp, .wish-month, .wish-replace { z-index: 2; }

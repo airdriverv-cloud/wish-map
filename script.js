@@ -245,33 +245,6 @@
   }
 
   /* ---------- rendering ---------- */
-  const wishMediaObserver = 'IntersectionObserver' in window
-    ? new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          const media = entry.target;
-          const url = media.dataset.bg;
-          if (url) {
-            media.style.backgroundImage = `url("${url}")`;
-            media.removeAttribute('data-bg');
-          }
-          wishMediaObserver.unobserve(media);
-        });
-      }, { rootMargin: '500px 0px', threshold: 0.01 })
-    : null;
-
-  function observeWishMedia() {
-    const media = $$('.wish-media[data-bg]');
-    if (!wishMediaObserver) {
-      media.forEach((item) => {
-        item.style.backgroundImage = `url("${item.dataset.bg}")`;
-        item.removeAttribute('data-bg');
-      });
-      return;
-    }
-    media.forEach((item) => wishMediaObserver.observe(item));
-  }
-
   function renderWishes() {
     if (!els.grid) return;
     const filter = state.filter;
@@ -283,13 +256,13 @@
     });
 
     const cards = visible.map((wish) => {
-      const mediaStyle = wish.image ? ` data-bg="${escapeHtml(wish.image)}"` : '';
+      const media = wish.image ? `<img class="wish-media-img" src="${escapeHtml(wish.image)}" alt="" loading="lazy" decoding="async">` : '';
       const doneClass = wish.done ? ' is-done' : '';
       const stamp = wish.done ? '<span class="wish-stamp">Сбылось</span>' : '';
       const edit = state.shared ? '' : `<button class="wish-edit" type="button" data-edit="${escapeHtml(wish.id)}" aria-label="Редактировать желание">✎</button>`;
       return `
         <article class="wish-card${doneClass}" data-id="${escapeHtml(wish.id)}">
-          <div class="wish-media${wish.image ? '' : ' no-image'}"${mediaStyle}>
+          <div class="wish-media${wish.image ? '' : ' no-image'}">${media}
             <span class="wish-cat">${CATEGORY_LABEL[wish.category] || 'Мечта'}</span>
             <button class="wish-check" type="button" data-check="${escapeHtml(wish.id)}" aria-pressed="${wish.done}" aria-label="${wish.done ? 'Вернуть в планы' : 'Отметить сбывшимся'}">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>
@@ -316,7 +289,6 @@
       </button>`;
 
     els.grid.innerHTML = cards + addCard;
-    observeWishMedia();
     if (els.empty) els.empty.hidden = visible.length !== 0 || state.wishes.length !== 0;
 
     if (els.countAll) els.countAll.textContent = String(state.wishes.length);
