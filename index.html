@@ -21,7 +21,7 @@
 <link rel="preload" href="assets/fonts/CormorantGaramond-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/Manrope-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css?v=24">
-<link rel="stylesheet" href="app.css?v=39">
+<link rel="stylesheet" href="app.css?v=40">
 <script>document.documentElement.classList.replace('no-js','js');</script>
 </head>
 <body>
@@ -439,6 +439,11 @@
     <p class="eyebrow">Новое изображение</p>
     <h2 id="imageModalTitle">Заменить кадр</h2>
     <p class="modal-lead" id="imageWishLabel">Опиши новый кадр — сгенерируем его прямо здесь, без регистрации.</p>
+    <p class="image-label">Что создаём</p>
+    <div class="image-modes" role="group" aria-label="Тип генерации">
+      <button class="image-mode is-active" type="button" data-image-mode="image" aria-pressed="true">Картинка</button>
+      <button class="image-mode" type="button" data-image-mode="video" aria-pressed="false">Видео <small>FAL</small></button>
+    </div>
     <p class="image-label">Способ</p>
     <div class="image-methods" role="radiogroup" aria-label="Способ добавления изображения">
       <button class="image-method is-active" type="button" data-image-method="find" role="radio" aria-checked="true" title="Найти готовое фото в интернете">
@@ -462,6 +467,14 @@
         <button class="btn" type="button" id="unlockFal">Открыть</button>
       </div>
       <p class="micro" id="falPinStatus">PIN нужен для каждой FAL-генерации.</p>
+    </div>
+
+    <div class="fal-balance" id="falBalance" hidden>
+      <div class="fal-balance-head">
+        <span>FAL · остаток</span>
+        <b id="falBalanceValue">—</b>
+      </div>
+      <p class="micro" id="falBalanceNote">Проверяю баланс…</p>
     </div>
 
     <p class="image-label">Вид</p>
@@ -507,6 +520,18 @@
       <p class="micro" id="imageCountHint">1–10 кадров. Локальный «Ноут» генерирует их по очереди.</p>
     </div>
 
+    <div class="video-options" id="videoOptions" hidden>
+      <label class="field">
+        <span>Длина видео</span>
+        <select id="videoDuration">
+          <option value="6">6 секунд</option>
+          <option value="8">8 секунд</option>
+          <option value="10">10 секунд</option>
+        </select>
+      </label>
+      <p class="micro" id="videoCost">≈ $0.48 · 6 секунд</p>
+    </div>
+
     <div class="modal-actions">
       <button class="text-link" type="button" id="copyImageRequest">Скопировать описание</button>
       <span class="modal-spacer"></span>
@@ -518,6 +543,15 @@
     <div class="image-gallery-wrap" id="imageGalleryWrap" hidden>
       <p class="eyebrow">Мои кадры</p>
       <div class="image-gallery" id="imageGallery"></div>
+    </div>
+
+    <div class="video-result" id="videoResult" hidden>
+      <p class="eyebrow">Видео желания</p>
+      <video id="wishVideoPreview" controls playsinline preload="metadata"></video>
+      <div class="video-result-actions">
+        <button class="btn btn-ghost" type="button" id="removeVideo">Убрать видео</button>
+        <a class="text-link" id="downloadVideo" href="#" target="_blank" rel="noopener">Открыть</a>
+      </div>
     </div>
   </div>
 </div>
@@ -545,6 +579,6 @@
 <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
 
 <script src="examples-data.js?v=1"></script>
-<script src="script.js?v=42" defer></script>
+<script src="script.js?v=45" defer></script>
 </body>
 </html>

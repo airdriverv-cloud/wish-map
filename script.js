@@ -76,6 +76,7 @@
   let importTimer = null;
   let imageMethod = 'find';
   let imageStyle = 'cartoon';
+  let imageMode = 'image';
   const FAL_PIN = '6620';
   const REMOTE_COMFY_URL = 'https://vik-laptop.tailebabca.ts.net:8443';
   const REMOTE_COMFY_PIN = '6620';
@@ -166,6 +167,17 @@
     imagePrompt: $('#imagePrompt'),
     imageDetails: $('#imageDetails'),
     imageCount: $('#imageCount'),
+    imageModes: $$('.image-mode'),
+    falBalance: $('#falBalance'),
+    falBalanceValue: $('#falBalanceValue'),
+    falBalanceNote: $('#falBalanceNote'),
+    videoOptions: $('#videoOptions'),
+    videoDuration: $('#videoDuration'),
+    videoCost: $('#videoCost'),
+    videoResult: $('#videoResult'),
+    wishVideoPreview: $('#wishVideoPreview'),
+    removeVideo: $('#removeVideo'),
+    downloadVideo: $('#downloadVideo'),
     imageGallery: $('#imageGallery'),
     imageGalleryWrap: $('#imageGalleryWrap'),
     generateImage: $('#generateImage'),
@@ -205,6 +217,7 @@
       category,
       image: typeof raw.image === 'string' && raw.image ? raw.image : (base ? base.image : ''),
       gallery: Array.isArray(raw.gallery) ? raw.gallery.filter((item) => typeof item === 'string').slice(0, 30) : [],
+      video: typeof raw.video === 'string' ? raw.video : '',
       done: Boolean(raw.done)
     };
   }
@@ -296,7 +309,9 @@
     });
 
     const cardHtml = (wish) => {
-      const media = wish.image ? `<img class="wish-media-img" src="${escapeHtml(wish.image)}" alt="" loading="lazy" decoding="async">` : '';
+      const media = wish.video
+        ? `<video class="wish-media-video" src="${escapeHtml(wish.video)}" poster="${escapeHtml(wish.image || '')}" controls playsinline preload="metadata"></video>`
+        : (wish.image ? `<img class="wish-media-img" src="${escapeHtml(wish.image)}" alt="" loading="lazy" decoding="async">` : '');
       const doneClass = wish.done ? ' is-done' : '';
       const stamp = wish.done ? '<span class="wish-stamp">Сбылось</span>' : '';
       const edit = state.shared ? '' : `<button class="wish-edit" type="button" data-edit="${escapeHtml(wish.id)}" aria-label="Редактировать желание">✎</button>`;
@@ -649,6 +664,7 @@
 
   /* ---------- image generation (no account) ---------- */
   function generateLabel() {
+    if (imageMode === 'video') return 'Сгенерировать видео';
     return IMAGE_METHODS[imageMethod]?.button || 'Сделать кадр';
   }
 
@@ -658,10 +674,88 @@
     }
   }
 
+  const FAL_IMAGE_COST = 0.003 * (640 * 800) / 1_000_000;
+  const FAL_VIDEO_COST_PER_SECOND = 0.08;
+  let balanceTimer = null;
+
+  function formatUsd(value) {
+    return '$' + Number(value).toFixed(value < 0.01 ? 4 : 2);
+  }
+
+  function updateVideoCost() {
+    if (!els.videoCost) return;
+    const duration = Number(els.videoDuration?.value) || 6;
+    els.videoCost.textContent = `≈ ${formatUsd(duration * FAL_VIDEO_COST_PER_SECOND)} · ${duration} секунд`;
+  }
+
+  function renderVideoResult() {
+    const wish = state.wishes.find((item) => item.id === imageWishId);
+    const video = wish?.video || '';
+    if (!els.videoResult) return;
+    els.videoResult.hidden = !video;
+    if (!video) return;
+    if (els.wishVideoPreview && els.wishVideoPreview.src !== video) els.wishVideoPreview.src = video;
+    if (els.downloadVideo) els.downloadVideo.href = video;
+  }
+
+  async function loadFalBalance() {
+    if (!els.falBalance) return;
+    if (balanceTimer) window.clearTimeout(balanceTimer);
+    const imageHint = `Кадр ≈ ${formatUsd(FAL_IMAGE_COST)}`;
+    const videoHint = `Видео 6 с ≈ ${formatUsd(6 * FAL_VIDEO_COST_PER_SECOND)}`;
+    els.falBalance.hidden = false;
+    if (els.falBalanceValue) els.falBalanceValue.textContent = '…';
+    if (els.falBalanceNote) els.falBalanceNote.textContent = 'Проверяю баланс FAL…';
+    try {
+      const response = await fetch('http://127.0.0.1:8189/balance', { cache: 'no-store' });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw Object.assign(new Error(data.error || 'balance ' + response.status), { needsBilling: data.needs_billing });
+      }
+      const balance = Number(data.balance);
+      const currency = data.currency || 'USD';
+      const leftImages = Math.floor(balance / FAL_IMAGE_COST);
+      const leftVideos = Math.floor(balance / (6 * FAL_VIDEO_COST_PER_SECOND));
+      if (els.falBalanceValue) els.falBalanceValue.textContent = `${currency === 'USD' ? '$' : ''}${balance.toFixed(2)}`;
+      if (els.falBalanceNote) {
+        els.falBalanceNote.textContent = `${imageHint} · хватит примерно на ${leftImages} кадров. ${videoHint} · на ${leftVideos} видео по 6 с.`;
+      }
+    } catch (error) {
+      if (els.falBalanceValue) els.falBalanceValue.textContent = 'нет доступа';
+      if (els.falBalanceNote) {
+        els.falBalanceNote.textContent = error?.needsBilling
+          ? `Ключу FAL нужно право billing:usage:read — остаток недоступен. Ориентир: ${imageHint}, ${videoHint}.`
+          : `FAL-мост не отвечает. Ориентир: ${imageHint}, ${videoHint}.`;
+      }
+    }
+  }
+
+  function setImageMode(mode) {
+    imageMode = mode === 'video' ? 'video' : 'image';
+    $$('.image-mode').forEach((button) => {
+      const active = button.dataset.imageMode === imageMode;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+    const panel = els.imageModal?.querySelector('.modal-panel');
+    panel?.classList.toggle('is-video', imageMode === 'video');
+    if (els.videoOptions) els.videoOptions.hidden = imageMode !== 'video';
+    if (imageMode === 'video') {
+      if (els.imageCount) els.imageCount.value = '1';
+      updateVideoCost();
+      setImageMethod('fal');
+    }
+    updateGenerateButton();
+  }
+
   function setImageMethod(method) {
     if (!IMAGE_METHODS[method]) return;
     if (method === 'fal' && !falUnlocked) {
       if (els.falPinPanel) els.falPinPanel.hidden = false;
+      if (els.falBalance) {
+        els.falBalance.hidden = false;
+        loadFalBalance();
+      }
       if (els.falPinStatus) {
         els.falPinStatus.textContent = 'Введи PIN, чтобы открыть FAL-генерацию.';
         els.falPinStatus.classList.remove('is-error');
@@ -681,6 +775,8 @@
       button.setAttribute('aria-checked', String(active));
     });
     if (els.falPinPanel) els.falPinPanel.hidden = true;
+    if (els.falBalance) els.falBalance.hidden = method !== 'fal';
+    if (method === 'fal') loadFalBalance();
     updateGenerateButton();
     saveImageDraft();
   }
@@ -766,6 +862,8 @@
     }
     const draft = getImageDraft(id);
     restoringDraft = true;
+    setImageMode('image');
+    renderVideoResult();
     if (els.imagePrompt) els.imagePrompt.value = draft.prompt || '';
     if (els.imageDetails) els.imageDetails.value = draft.details || '';
     if (els.imageStatus) {
@@ -917,7 +1015,9 @@
   function setGenerateBusy(busy, text) {
     if (els.generateImage) {
       els.generateImage.disabled = busy;
-      els.generateImage.textContent = busy ? (imageMethod === 'find' ? 'Ищу кадр…' : 'Генерирую…') : generateLabel();
+      els.generateImage.textContent = busy
+        ? (imageMode === 'video' ? 'Генерирую видео…' : (imageMethod === 'find' ? 'Ищу кадр…' : 'Генерирую…'))
+        : generateLabel();
     }
     if (els.imageStatus && text) {
       els.imageStatus.textContent = text;
@@ -1005,6 +1105,60 @@
       return data.url;
     } finally {
       window.clearTimeout(timer);
+    }
+  }
+
+  async function generateVideo() {
+    const prompt = els.imagePrompt?.value.trim() || '';
+    if (!prompt) {
+      showToast('Опиши, что должно быть в видео');
+      els.imagePrompt?.focus();
+      return;
+    }
+    if (!falUnlocked) {
+      setImageMethod('fal');
+      return;
+    }
+    const wish = state.wishes.find((item) => item.id === imageWishId);
+    if (!wish) return;
+    const details = els.imageDetails?.value.trim() || '';
+    const duration = Number(els.videoDuration?.value) || 6;
+    setGenerateBusy(true, 'FAL генерирует видео…');
+    if (els.imageStatus) {
+      els.imageStatus.textContent = 'Генерирую видео. Это может занять минуту…';
+      els.imageStatus.classList.remove('is-error');
+    }
+    try {
+      const english = await translateToEnglish([prompt, details].filter(Boolean).join('. '));
+      const videoPrompt = [english, 'cinematic vertical 9:16 video, natural motion, no text, no watermark']
+        .filter(Boolean).join('. ');
+      const response = await fetch('http://127.0.0.1:8189/generate-video', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: FAL_PIN, prompt: videoPrompt, duration })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.url) throw new Error(data.error || 'video error');
+      wish.video = data.url;
+      wish.videoPrompt = prompt;
+      falUnlocked = false;
+      if (els.falPinPanel) els.falPinPanel.hidden = true;
+      saveLocal();
+      renderWishes();
+      renderVideoResult();
+      if (els.imageStatus) {
+        els.imageStatus.textContent = `Видео готово · ${duration} секунд.`;
+        els.imageStatus.classList.remove('is-error');
+      }
+      showToast('Видео добавлено в карточку');
+    } catch (error) {
+      if (els.imageStatus) {
+        els.imageStatus.textContent = 'Видео не получилось: ' + (error.message || 'ошибка FAL');
+        els.imageStatus.classList.add('is-error');
+      }
+      showToast('Видео не сгенерировалось');
+    } finally {
+      setGenerateBusy(false);
     }
   }
 
@@ -1113,6 +1267,7 @@
   }
 
   async function generateImage() {
+    if (imageMode === 'video') return generateVideo();
     const prompt = els.imagePrompt?.value.trim() || '';
     if (!prompt) {
       showToast('Опиши, что должно быть на кадре');
@@ -1602,8 +1757,27 @@
     }
   });
   els.copyImageRequest?.addEventListener('click', copyImageRequest);
+  $$('.image-mode').forEach((button) => {
+    button.addEventListener('click', () => setImageMode(button.dataset.imageMode));
+  });
   $$('.image-method').forEach((button) => {
-    button.addEventListener('click', () => setImageMethod(button.dataset.imageMethod));
+    button.addEventListener('click', () => {
+      if (imageMode === 'video' && button.dataset.imageMethod !== 'fal') {
+        showToast('Для видео используется FAL');
+        return;
+      }
+      setImageMethod(button.dataset.imageMethod);
+    });
+  });
+  els.videoDuration?.addEventListener('change', updateVideoCost);
+  els.removeVideo?.addEventListener('click', () => {
+    const wish = state.wishes.find((item) => item.id === imageWishId);
+    if (!wish) return;
+    wish.video = '';
+    saveLocal();
+    renderWishes();
+    renderVideoResult();
+    showToast('Видео убрано');
   });
   $$('.image-style').forEach((button) => {
     button.addEventListener('click', () => setImageStyle(button.dataset.imageStyle));
