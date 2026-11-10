@@ -138,6 +138,8 @@
   let imageMethod = 'find';
   let imageStyle = 'cartoon';
   const FAL_PIN = '6620';
+  const REMOTE_COMFY_URL = 'https://vik-laptop.tailebabca.ts.net:8443';
+  const REMOTE_COMFY_PIN = '6620';
   let falUnlocked = false;
 
   const COLLAGE_LAYOUTS = {
@@ -923,23 +925,64 @@
     }
   }
 
-  async function localGenerate(prompt) {
+  async function pollComfyJob(base, jobId, headers, signal) {
+    while (true) {
+      await new Promise((resolve) => window.setTimeout(resolve, 3000));
+      const poll = await fetch(`${base}/status/${jobId}`, { headers, signal });
+      if (!poll.ok) throw new Error('comfy status ' + poll.status);
+      const state = await poll.json();
+      if (state.status === 'done' && state.url) {
+        await loadImage(state.url, 30000);
+        return state.url;
+      }
+      if (state.status === 'error') throw new Error(state.error || 'comfy error');
+    }
+  }
+
+  async function startComfy(base, prompt, headers, timeout) {
     const controller = new AbortController();
-    const timer = window.setTimeout(() => controller.abort(), 90000);
+    const timer = window.setTimeout(() => controller.abort(), timeout);
     try {
-      const response = await fetch('http://127.0.0.1:8190/generate', {
+      const response = await fetch(`${base}/generate`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ prompt }),
         signal: controller.signal
       });
-      if (!response.ok) throw new Error('local bridge ' + response.status);
-      const data = await response.json();
-      if (!data?.url) throw new Error('local no image');
-      await loadImage(data.url, 30000);
-      return data.url;
+      if (!response.ok) throw new Error('comfy start ' + response.status);
+      const started = await response.json();
+      if (started?.url) {
+        await loadImage(started.url, 30000);
+        return started.url;
+      }
+      if (!started?.job_id) throw new Error('comfy no job');
+      return await pollComfyJob(base, started.job_id, headers, controller.signal);
     } finally {
       window.clearTimeout(timer);
+    }
+  }
+
+  async function remoteGenerate(prompt) {
+    return startComfy(
+      REMOTE_COMFY_URL,
+      prompt,
+      { 'Content-Type': 'application/json', 'X-Wishmap-Pin': REMOTE_COMFY_PIN },
+      90000
+    );
+  }
+
+  async function localGenerate(prompt) {
+    try {
+      const url = await startComfy(
+        'http://127.0.0.1:8190',
+        prompt,
+        { 'Content-Type': 'application/json', 'X-Wishmap-Pin': REMOTE_COMFY_PIN },
+        90000
+      );
+      return { url, via: 'local' };
+    } catch {
+      const url = await remoteGenerate(prompt);
+      return { url, via: 'remote' };
     }
   }
 
@@ -1020,10 +1063,11 @@
 
     if (imageMethod === 'local') {
       try {
-        imageUrl = await localGenerate(fullPrompt);
-        used = 'local';
+        const local = await localGenerate(fullPrompt);
+        imageUrl = local.url;
+        used = local.via;
       } catch {
-        if (els.imageStatus) els.imageStatus.textContent = 'Ноут-мост не ответил — генерирую резервно…';
+        if (els.imageStatus) els.imageStatus.textContent = 'Ноут недоступен — генерирую резервно…';
       }
     }
 
@@ -1068,6 +1112,7 @@
     setGenerateBusy(false);
     closeModal(els.imageModal);
     if (used === 'local') showToast('Ноут сгенерировал кадр');
+    else if (used === 'remote') showToast('Удалённый Ноут сгенерировал кадр');
     else if (used === 'fal') showToast('FAL-кадр готов — PIN принят');
     else if (used === 'generated') showToast('Резервный кадр сгенерирован');
     else if (used === 'photo') showToast('Нашёл новый кадр в интернете');
