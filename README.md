@@ -47,9 +47,8 @@ GitHub Pages: ветка `main`, корень репозитория. Файл `
 
 ## Видео
 
-- `assets/video/wall/` — 10 коротких FAL-клипов для живой видеокарты на сайте.
-- `assets/video/clips/` — те же 10 клипов в 960×540 для скачивания.
-- `assets/video/fal-clips.zip` — архив всех 10 FAL-клипов.
+- `assets/video/fal-wish-map.mp4` — единый 45-секундный фильм из 10 FAL-клипов.
+- `assets/video/fal-clips.zip` — архив исходных 10 FAL-клипов.
 
 
 - `assets/video/wish-map.mp4` — локальный мультяшный фильм, 51 секунда, 1920×1080, со звуком.

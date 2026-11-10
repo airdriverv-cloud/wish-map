@@ -502,3 +502,92 @@ button.text-link:hover { border-color: var(--gold); }
 @media (max-width: 900px) {
   .deck-card-a h3, .deck-card-b h3 { top: 38px; font-size: 20px; }
 }
+
+/* one combined FAL film */
+.fal-film {
+  position: relative;
+  border: 1px solid var(--line);
+  background: #020807;
+  box-shadow: 0 34px 90px rgba(0, 0, 0, 0.55);
+}
+.fal-film video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: block;
+  object-fit: contain;
+  background: #000;
+}
+.fal-film-badge {
+  position: absolute;
+  top: 14px; left: 14px;
+  z-index: 4;
+  padding: 6px 9px;
+  border: 1px solid rgba(201, 160, 99, 0.28);
+  background: rgba(7, 18, 15, 0.78);
+  color: var(--gold-light);
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  pointer-events: none;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.fal-expand {
+  position: absolute;
+  top: 14px; right: 14px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(246, 237, 223, 0.24);
+  background: rgba(7, 18, 15, 0.78);
+  color: var(--cream);
+  font-family: "Manrope", sans-serif;
+  font-size: 8px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.fal-expand:hover { border-color: var(--gold); color: var(--gold-light); }
+.fal-expand span { font-size: 14px; line-height: 0.7; }
+.fal-film-bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.fal-chapters { display: flex; flex-wrap: wrap; gap: 6px; max-width: 860px; }
+.fal-chapter {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-family: "Manrope", sans-serif;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.25s, color 0.25s, background 0.25s;
+}
+.fal-chapter span { color: var(--gold); font-size: 9px; }
+.fal-chapter:hover { border-color: rgba(201, 160, 99, 0.55); color: var(--cream); }
+.fal-chapter.is-active { border-color: var(--gold); background: var(--gold); color: #10231d; }
+.fal-chapter.is-active span { color: #10231d; }
+.fal-film-links { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding-top: 4px; }
+.fal-film-links .text-link { margin-left: 0; }
+@media (max-width: 720px) {
+  .fal-film-badge { top: 9px; left: 9px; font-size: 7px; }
+  .fal-expand { top: 9px; right: 9px; padding: 6px 8px; font-size: 7px; }
+  .fal-film-bar { display: block; }
+  .fal-chapters { gap: 5px; }
+  .fal-chapter { padding: 6px 7px; font-size: 7px; }
+  .fal-film-links { margin-top: 14px; }
+}

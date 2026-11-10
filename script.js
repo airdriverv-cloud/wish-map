@@ -717,21 +717,49 @@
     video?.addEventListener('play', () => shell.classList.add('is-playing'));
   });
 
-  /* ---------- FAL video wall ---------- */
-  const wallVideos = $$('.video-tile video');
-  if (wallVideos.length && 'IntersectionObserver' in window && !reduceMotion.matches) {
-    const wallObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        const video = entry.target;
-        if (entry.isIntersecting) {
-          video.play().catch(() => {});
-        } else {
-          video.pause();
-        }
-      });
-    }, { rootMargin: '80px 0px', threshold: 0.15 });
-    wallVideos.forEach((video) => wallObserver.observe(video));
+  /* ---------- one FAL film ---------- */
+  const falFilm = $('#falFilmVideo');
+  const falExpand = $('#falExpand');
+  const falChapters = $$('.fal-chapter');
+  const chapterTimes = falChapters.map((button) => Number(button.dataset.start) || 0);
+
+  async function enterFullscreen() {
+    if (!falFilm) return;
+    try {
+      if (falFilm.requestFullscreen) {
+        await falFilm.requestFullscreen();
+      } else if (falFilm.webkitEnterFullscreen) {
+        falFilm.webkitEnterFullscreen();
+      } else if (falFilm.webkitRequestFullscreen) {
+        falFilm.webkitRequestFullscreen();
+      } else {
+        showToast('Полный экран доступен через кнопку в плеере');
+      }
+    } catch {
+      showToast('Нажми кнопку полного экрана в плеере');
+    }
   }
+
+  falExpand?.addEventListener('click', enterFullscreen);
+  falFilm?.addEventListener('dblclick', enterFullscreen);
+
+  falChapters.forEach((button, index) => {
+    button.addEventListener('click', () => {
+      if (!falFilm) return;
+      falFilm.currentTime = chapterTimes[index];
+      falFilm.play().catch(() => {});
+      falChapters.forEach((item) => item.classList.toggle('is-active', item === button));
+    });
+  });
+
+  falFilm?.addEventListener('timeupdate', () => {
+    if (!falChapters.length) return;
+    let active = 0;
+    chapterTimes.forEach((time, index) => {
+      if (falFilm.currentTime + 0.1 >= time) active = index;
+    });
+    falChapters.forEach((button, index) => button.classList.toggle('is-active', index === active));
+  });
 
   /* ---------- bindings ---------- */
   els.grid?.addEventListener('click', (event) => {
