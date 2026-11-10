@@ -47,20 +47,23 @@
   let toastTimer = null;
   let lastFocused = null;
   let imageWishId = null;
-  let imageMode = 'find';
+  let imageMode = 'cartoon';
 
   const IMAGE_MODES = {
-    find: {
-      label: 'Найти',
-      placeholder: 'Например: пара на яхте в бирюзовой бухте, тёплый закат, без текста'
+    photo: {
+      label: 'Фото',
+      placeholder: 'Например: пара на яхте в бирюзовой бухте, тёплый закат',
+      style: 'realistic editorial travel photograph, natural light, 35mm, warm film colors'
     },
-    local: {
-      label: 'Ноут',
-      placeholder: 'Опиши сцену для генерации на ноутбуке: герои, место, свет, настроение'
+    cartoon: {
+      label: 'Мульт',
+      placeholder: 'Например: пара на яхте в бирюзовой бухте, тёплый закат',
+      style: 'hand-painted 2D cartoon illustration, warm cinematic palette, soft grain, storybook animation'
     },
-    fal: {
-      label: 'FAL',
-      placeholder: 'Опиши сцену для fal.ai: герои, место, свет, стиль, настроение'
+    cinema: {
+      label: 'Кино',
+      placeholder: 'Например: пара на яхте в бирюзовой бухте, тёплый закат',
+      style: 'cinematic 3D animation still, volumetric light, shallow depth of field, rich color grade'
     }
   };
 
@@ -95,7 +98,8 @@
     imageWishLabel: $('#imageWishLabel'),
     imagePrompt: $('#imagePrompt'),
     imageDetails: $('#imageDetails'),
-    sendImageRequest: $('#sendImageRequest'),
+    generateImage: $('#generateImage'),
+    imageStatus: $('#imageStatus'),
     copyImageRequest: $('#copyImageRequest'),
     toast: $('#toast')
   };
@@ -125,7 +129,7 @@
       note: String(raw.note || '').slice(0, 160),
       month: String(raw.month || '').slice(0, 50),
       category,
-      image: base ? base.image : '',
+      image: typeof raw.image === 'string' && raw.image ? raw.image : (base ? base.image : ''),
       done: Boolean(raw.done)
     };
   }
@@ -380,7 +384,7 @@
     showToast('Удалено');
   }
 
-  /* ---------- image replacement requests ---------- */
+  /* ---------- image generation (no account) ---------- */
   function setImageMode(mode) {
     if (!IMAGE_MODES[mode]) return;
     imageMode = mode;
@@ -401,91 +405,177 @@
     if (!wish) return;
     imageWishId = id;
     if (els.imageWishLabel) {
-      els.imageWishLabel.innerHTML = `Желание: <b>${escapeHtml(wish.title)}</b>. Выбери способ и опиши, что должно быть на новом кадре.`;
+      els.imageWishLabel.innerHTML = `Желание: <b>${escapeHtml(wish.title)}</b>. Опиши новый кадр — сгенерируем без регистрации.`;
     }
     if (els.imagePrompt) els.imagePrompt.value = '';
     if (els.imageDetails) els.imageDetails.value = '';
-    setImageMode('find');
+    if (els.imageStatus) {
+      els.imageStatus.textContent = 'Без аккаунта. Опиши кадр — подберу фото или сгенерирую.';
+      els.imageStatus.classList.remove('is-error');
+    }
+    setImageMode('cartoon');
     openModal(els.imageModal);
     window.setTimeout(() => els.imagePrompt?.focus(), 80);
   }
 
-  function buildImageRequestText() {
-    const wish = state.wishes.find((item) => item.id === imageWishId);
-    const prompt = els.imagePrompt?.value.trim() || '';
-    const details = els.imageDetails?.value.trim() || '';
-    return [
-      'Заявка на изображение',
-      `Карта: ${location.origin}${location.pathname}`,
-      `Желание: ${wish?.title || '—'}`,
-      `ID: ${imageWishId || '—'}`,
-      `Режим: ${IMAGE_MODES[imageMode].label}`,
-      `Что заменить или сгенерировать: ${prompt || '—'}`,
-      details ? `Детали: ${details}` : '',
-      `Текущий кадр: ${wish?.image || 'градиент'}`
-    ].filter(Boolean).join('\n');
-  }
+  const FALLBACK_IMAGES = [
+    'assets/img/scenes/scene-yacht.jpg',
+    'assets/img/scenes/scene-vietnam.jpg',
+    'assets/img/scenes/scene-ski.jpg',
+    'assets/img/scenes/scene-egypt.jpg',
+    'assets/img/scenes/scene-turkey.jpg',
+    'assets/img/scenes/scene-pyatigorsk.jpg',
+    'assets/img/scenes/scene-dolzhanka.jpg',
+    'assets/img/scenes/scene-love.jpg',
+    'assets/img/scenes/scene-business.jpg',
+    'assets/img/scenes/scene-income.jpg'
+  ];
 
-  async function copyText(text, successMessage) {
+  async function translateToEnglish(text) {
+    if (!text) return '';
     try {
-      await navigator.clipboard.writeText(text);
+      const controller = new AbortController();
+      const timer = window.setTimeout(() => controller.abort(), 8000);
+      const response = await fetch(
+        'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=ru|en',
+        { signal: controller.signal }
+      );
+      window.clearTimeout(timer);
+      const data = await response.json();
+      const translated = data?.responseData?.translatedText;
+      return typeof translated === 'string' && translated ? translated : text;
     } catch {
-      const scratch = document.createElement('textarea');
-      scratch.value = text;
-      scratch.style.position = 'fixed';
-      scratch.style.opacity = '0';
-      document.body.appendChild(scratch);
-      scratch.select();
-      document.execCommand('copy');
-      scratch.remove();
+      return text;
     }
-    showToast(successMessage);
   }
 
-  function sendImageRequest() {
+  function loadImage(url, timeout = 45000) {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      const timer = window.setTimeout(() => reject(new Error('timeout')), timeout);
+      image.onload = () => {
+        window.clearTimeout(timer);
+        resolve(url);
+      };
+      image.onerror = () => {
+        window.clearTimeout(timer);
+        reject(new Error('image error'));
+      };
+      image.src = url;
+    });
+  }
+
+  async function findCommonsImage(query) {
+    const search = await translateToEnglish(query);
+    const params = new URLSearchParams({
+      action: 'query',
+      generator: 'search',
+      gsrsearch: `${search} filetype:bitmap`,
+      gsrnamespace: '6',
+      gsrlimit: '12',
+      prop: 'imageinfo',
+      iiprop: 'url',
+      iiurlwidth: '800',
+      format: 'json',
+      origin: '*'
+    });
+    const response = await fetch('https://commons.wikimedia.org/w/api.php?' + params.toString());
+    if (!response.ok) throw new Error('commons');
+    const data = await response.json();
+    const pages = data?.query?.pages;
+    if (!pages) throw new Error('no pages');
+    const candidates = Object.values(pages)
+      .map((page) => {
+        const info = page?.imageinfo?.[0];
+        return {
+          url: info?.thumburl,
+          title: page?.title || '',
+          width: Number(info?.thumbwidth) || 0,
+          height: Number(info?.thumbheight) || 0
+        };
+      })
+      .filter((item) => item.url && !/(stamp|logo|map|diagram|poster|cover|plaque|sign)/i.test(item.title));
+    if (!candidates.length) throw new Error('no candidates');
+    const portrait = candidates.filter((item) => item.height >= item.width * 1.05);
+    const pool = portrait.length ? portrait : candidates;
+    return pool[Math.floor(Math.random() * Math.min(pool.length, 6))].url;
+  }
+
+  function fallbackImage(wish) {
+    const options = FALLBACK_IMAGES.filter((url) => url !== wish?.image);
+    return options[Math.floor(Math.random() * options.length)] || FALLBACK_IMAGES[0];
+  }
+
+  function setGenerateBusy(busy, text) {
+    if (els.generateImage) {
+      els.generateImage.disabled = busy;
+      els.generateImage.textContent = busy ? 'Ищу кадр…' : 'Сгенерировать';
+    }
+    if (els.imageStatus && text) {
+      els.imageStatus.textContent = text;
+      els.imageStatus.classList.remove('is-error');
+    }
+  }
+
+  async function generateImage() {
     const prompt = els.imagePrompt?.value.trim() || '';
     if (!prompt) {
-      showToast('Опиши, что заменить или сгенерировать');
+      showToast('Опиши, что должно быть на кадре');
       els.imagePrompt?.focus();
       return;
     }
     const wish = state.wishes.find((item) => item.id === imageWishId);
     if (!wish) return;
-    const text = buildImageRequestText();
-    try {
-      const requests = JSON.parse(localStorage.getItem('wishmap-image-requests') || '[]');
-      requests.unshift({
-        wishId: imageWishId,
-        title: wish.title,
-        mode: imageMode,
-        prompt,
-        details: els.imageDetails?.value.trim() || '',
-        createdAt: new Date().toISOString()
-      });
-      localStorage.setItem('wishmap-image-requests', JSON.stringify(requests.slice(0, 40)));
-    } catch {
-      // локальная история не критична
+
+    const details = els.imageDetails?.value.trim() || '';
+    const mode = IMAGE_MODES[imageMode];
+    setGenerateBusy(true, 'Без аккаунта. Ищу или генерирую кадр…');
+
+    let imageUrl = null;
+    let used = '';
+
+    if (imageMode !== 'photo') {
+      try {
+        const english = await translateToEnglish([prompt, details].filter(Boolean).join('. '));
+        const fullPrompt = [
+          english,
+          mode.style,
+          'vertical 4:5 composition, no text, no letters, no watermark, no logo'
+        ].filter(Boolean).join('. ');
+        const seed = Math.floor(Math.random() * 1_000_000_000);
+        const candidate = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(fullPrompt) +
+          `?width=640&height=800&seed=${seed}&nologo=true`;
+        imageUrl = await loadImage(candidate, 40000);
+        used = 'generated';
+      } catch {
+        imageUrl = null;
+      }
     }
 
-    const title = `[image] ${wish.title} · ${IMAGE_MODES[imageMode].label}`;
-    const url = 'https://github.com/airdriverv-cloud/wish-map/issues/new?' + new URLSearchParams({
-      title,
-      body: text,
-      labels: 'image-request',
-      assignees: 'airdriverv-cloud'
-    }).toString();
-    const popup = window.open(url, '_blank');
-    if (popup) popup.opener = null;
-    if (!popup) {
-      copyText(text, 'Окно GitHub не открылось — запрос скопирован');
-    } else {
-      showToast('Заявка открыта в GitHub Issues');
+    if (!imageUrl) {
+      try {
+        const query = [prompt, details].filter(Boolean).join(' ') || wish.title;
+        imageUrl = await findCommonsImage(query);
+        await loadImage(imageUrl);
+        used = 'photo';
+      } catch {
+        imageUrl = fallbackImage(wish);
+        used = 'fallback';
+      }
     }
+
+    wish.image = imageUrl;
+    saveLocal();
+    renderWishes();
+    setGenerateBusy(false);
     closeModal(els.imageModal);
+    if (used === 'generated') showToast('Новый кадр сгенерирован — без регистрации');
+    else if (used === 'photo') showToast('Подобрал новый кадр — без регистрации');
+    else showToast('Поставил кадр из коллекции — без регистрации');
   }
 
   function copyImageRequest() {
-    copyText(buildImageRequestText(), 'Запрос скопирован — можно вставить в чат');
+    copyText(buildImageRequestText(), 'Описание скопировано — можно вставить в чат');
   }
 
   /* ---------- share ---------- */
@@ -788,7 +878,7 @@
   els.importShared?.addEventListener('click', importShared);
   els.wishForm?.addEventListener('submit', saveWish);
   els.deleteWish?.addEventListener('click', deleteWish);
-  els.sendImageRequest?.addEventListener('click', sendImageRequest);
+  els.generateImage?.addEventListener('click', generateImage);
   els.copyImageRequest?.addEventListener('click', copyImageRequest);
   $$('.image-mode').forEach((button) => {
     button.addEventListener('click', () => setImageMode(button.dataset.imageMode));
