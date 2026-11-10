@@ -8,6 +8,7 @@
   const COLLAGE_KEY = 'wishmap-collage-layout-v1';
   const EXAMPLE_INBOX_KEY = 'wishmap-example-inbox-v1';
   const COLLAGE_SAVED_KEY = 'wishmap-collage-saved-v1';
+  const GRID_COLS_KEY = 'wishmap-grid-columns-v1';
   const CARD_IMAGES = {
     dombay: 'assets/img/card-01.jpg',
     egypt: 'assets/img/card-02.jpg',
@@ -86,9 +87,12 @@
     polaroid: { label: 'Полароиды · тёплые рамки' }
   };
   let collageLayout = 'mosaic';
+  let gridColumns = 'current';
   try {
     const savedCollage = localStorage.getItem(COLLAGE_KEY);
     if (savedCollage && COLLAGE_LAYOUTS[savedCollage]) collageLayout = savedCollage;
+    const savedCols = localStorage.getItem(GRID_COLS_KEY);
+    if (['2', '4', 'current'].includes(savedCols)) gridColumns = savedCols;
   } catch {}
 
   const IMAGE_STYLES = {
@@ -407,6 +411,17 @@
     }
   }
 
+  function applyGridColumns() {
+    if (!els.grid) return;
+    els.grid.classList.remove('view-2', 'view-4');
+    if (gridColumns === '2' || gridColumns === '4') els.grid.classList.add(`view-${gridColumns}`);
+    $$('.view-quick-tab').forEach((button) => {
+      const active = button.dataset.gridCols === gridColumns;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+  }
+
   function renderCollage() {
     if (!els.grid) return;
     els.grid.classList.remove('is-mosaic', 'is-grid', 'is-polaroid');
@@ -416,6 +431,7 @@
       button.classList.toggle('is-active', active);
       button.setAttribute('aria-pressed', String(active));
     });
+    applyGridColumns();
   }
 
   function exampleImage(example) {
@@ -1482,6 +1498,13 @@
   els.deleteWish?.addEventListener('click', deleteWish);
   $$('.collage-tab, .collage-quick-tab').forEach((button) => {
     button.addEventListener('click', () => setCollageLayout(button.dataset.collageLayout));
+  });
+  $$('.view-quick-tab').forEach((button) => {
+    button.addEventListener('click', () => {
+      gridColumns = button.dataset.gridCols || 'current';
+      try { localStorage.setItem(GRID_COLS_KEY, gridColumns); } catch {}
+      applyGridColumns();
+    });
   });
   $('#saveCollageView')?.addEventListener('click', () => {
     try {
