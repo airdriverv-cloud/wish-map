@@ -1,0 +1,49 @@
+.examples-page { min-height: 100vh; }
+.examples-main { padding-bottom: 88px; }
+.examples-hero { padding: 92px 0 44px; }
+.examples-hero .eyebrow { margin-bottom: 20px; }
+.examples-hero-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr); gap: 48px; align-items: end; }
+.examples-hero h1 { margin: 0; font-family: "Cormorant", Georgia, serif; font-size: clamp(54px, 7.8vw, 112px); font-weight: 500; line-height: 0.86; letter-spacing: -0.045em; color: var(--cream); }
+.examples-hero h1 em { color: var(--gold-light); font-weight: 300; }
+.examples-hero .section-note { margin: 0 0 6px; max-width: 360px; }
+.examples-sheet { padding-top: 18px; }
+.examples-toolbar { display: flex; align-items: flex-end; justify-content: space-between; gap: 22px; flex-wrap: wrap; padding-bottom: 18px; border-bottom: 1px solid var(--line-soft); }
+.examples-view { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.examples-view-label { margin-right: 4px; color: var(--muted); font-family: "Manrope", sans-serif; font-size: 7px; letter-spacing: 0.14em; text-transform: uppercase; }
+.view-tab { padding: 6px 8px; border: 1px solid var(--line); background: transparent; color: var(--muted); font-family: "Manrope", sans-serif; font-size: 7px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
+.view-tab:hover { color: var(--cream); border-color: rgba(201, 160, 99, 0.55); }
+.view-tab.is-active { background: var(--gold); border-color: var(--gold); color: #10231d; }
+.examples-sheet-foot { display: flex; justify-content: space-between; gap: 16px; padding: 14px 0 18px; color: var(--muted); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; }
+.examples-page-grid { display: grid; gap: 22px 18px; align-items: start; }
+.examples-page-grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px 24px; }
+.examples-page-grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.examples-page-grid.cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.examples-page-grid .wish-media { aspect-ratio: 4 / 5; }
+.examples-page-grid .wish-body h3 { font-size: 25px; }
+.examples-page-grid.cols-2 .wish-body h3 { font-size: 32px; }
+.examples-empty { padding: 40px 0; color: var(--muted); }
+.nav a.is-active { color: var(--gold-light); }
+@media (max-width: 1100px) {
+  .examples-page-grid.cols-5 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 860px) {
+  .examples-hero { padding-top: 70px; }
+  .examples-hero-grid { grid-template-columns: 1fr; gap: 20px; }
+  .examples-page-grid.cols-5,
+  .examples-page-grid.cols-4 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .examples-toolbar { align-items: flex-start; flex-direction: column; }
+}
+@media (max-width: 620px) {
+  .examples-page-grid.cols-5,
+  .examples-page-grid.cols-4,
+  .examples-page-grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 12px; }
+  .examples-page-grid .wish-body h3,
+  .examples-page-grid.cols-2 .wish-body h3 { font-size: 21px; }
+  .examples-page-grid .wish-body { padding: 12px; }
+  .examples-page-grid .wish-cat { font-size: 6px; }
+  .examples-sheet-foot { align-items: flex-start; flex-direction: column; gap: 6px; }
+  .examples-view { gap: 4px; }
+  .view-tab { padding: 6px; }
+}
+
+.examples-page .reveal { opacity: 1 !important; transform: none !important; }

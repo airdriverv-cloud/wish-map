@@ -6,6 +6,7 @@
   const STORAGE_KEY = 'wishmap-viktor-v2';
   const IMAGE_DRAFT_KEY = 'wishmap-image-drafts-v1';
   const COLLAGE_KEY = 'wishmap-collage-layout-v1';
+  const EXAMPLE_INBOX_KEY = 'wishmap-example-inbox-v1';
   const COLLAGE_SAVED_KEY = 'wishmap-collage-saved-v1';
   const CARD_IMAGES = {
     dombay: 'assets/img/card-01.jpg',
@@ -51,71 +52,8 @@
     dream: 'Мечта'
   };
 
-  const EXAMPLES = [
-    { id: 'ex-t1', category: 'travel', title: 'Северное сияние в Териберке', note: 'февраль, мороз, термос' },
-    { id: 'ex-t2', category: 'travel', title: 'Месяц в Тбилиси', note: 'без рабочего ноутбука' },
-    { id: 'ex-t3', category: 'travel', title: 'Байкал по льду', note: 'собачья упряжка' },
-    { id: 'ex-t4', category: 'travel', title: 'Трек в Доломитах', note: '4 дня, ночёвки в приютах' },
-    { id: 'ex-t5', category: 'travel', title: 'Рассвет на вулкане', note: 'подъём ночью' },
-    { id: 'ex-t6', category: 'travel', title: 'Яхта Турция — Греция', note: '7 дней' },
-    { id: 'ex-t7', category: 'travel', title: 'Остров без интернета', note: 'неделя' },
-    { id: 'ex-t8', category: 'travel', title: 'Сакура в Японии', note: 'апрель' },
-    { id: 'ex-t9', category: 'travel', title: 'Road trip Грузия — Армения', note: '10 дней' },
-    { id: 'ex-t10', category: 'travel', title: 'Домик у океана', note: 'месяц с сёрферами' },
-
-    { id: 'ex-b1', category: 'body', title: '30 дней без будильника', note: 'просыпаться самому' },
-    { id: 'ex-b2', category: 'body', title: 'Полный чек-ап', note: 'закрыть все риски' },
-    { id: 'ex-b3', category: 'body', title: '8 часов сна 30 дней', note: 'без исключений' },
-    { id: 'ex-b4', category: 'body', title: '2 км в открытой воде', note: 'без остановки' },
-    { id: 'ex-b5', category: 'body', title: '15 подтягиваний', note: 'чистая техника' },
-    { id: 'ex-b6', category: 'body', title: '10 дней тишины', note: 'ретрит без телефона' },
-    { id: 'ex-b7', category: 'body', title: 'Месяц без алкоголя', note: 'проверить энергию' },
-    { id: 'ex-b8', category: 'body', title: 'Курс первой помощи', note: 'уметь спасать' },
-    { id: 'ex-b9', category: 'body', title: 'Полумарафон', note: 'финиш без травмы' },
-    { id: 'ex-b10', category: 'body', title: 'Неделя цифрового детокса', note: 'телефон в ящике' },
-
-    { id: 'ex-d1', category: 'business', title: 'Бизнес 30 дней без меня', note: 'команда и регламенты' },
-    { id: 'ex-d2', category: 'business', title: '1 000 000 ₽ 12 месяцев', note: 'стабильно, не разово' },
-    { id: 'ex-d3', category: 'business', title: 'Подушка на 12 месяцев', note: 'расходы закрыты' },
-    { id: 'ex-d4', category: 'business', title: 'Первый коммерческий объект', note: 'доход с актива' },
-    { id: 'ex-d5', category: 'business', title: 'Продукт на 100 клиентов', note: 'проверить спрос' },
-    { id: 'ex-d6', category: 'business', title: 'Выступить на конференции', note: 'своя тема' },
-    { id: 'ex-d7', category: 'business', title: 'Нанять COO', note: 'сильнее меня в операционке' },
-    { id: 'ex-d8', category: 'business', title: 'Автоматизировать 80% рутины', note: 'освободить время' },
-    { id: 'ex-d9', category: 'business', title: 'Инвестировать в 3 проекта', note: 'деньги работают' },
-    { id: 'ex-d10', category: 'business', title: '3 месяца вне операционки', note: 'проверить свободу' },
-
-    { id: 'ex-l1', category: 'love', title: '12 свиданий в новых местах', note: 'раз в месяц' },
-    { id: 'ex-l2', category: 'love', title: 'Ужины без телефонов', note: 'каждый день' },
-    { id: 'ex-l3', category: 'love', title: 'Предложение в своём месте', note: 'выбрать вместе' },
-    { id: 'ex-l4', category: 'love', title: 'Письма через 5 лет', note: 'написать друг другу' },
-    { id: 'ex-l5', category: 'love', title: '7 дней без ноутбуков', note: 'только вдвоём' },
-    { id: 'ex-l6', category: 'love', title: 'Семейный фотоальбом', note: 'за год' },
-    { id: 'ex-l7', category: 'love', title: 'Ужин для друзей во дворе', note: 'большой стол' },
-    { id: 'ex-l8', category: 'love', title: 'Поездка с родителями', note: 'туда, куда они хотели' },
-    { id: 'ex-l9', category: 'love', title: 'Стать наставником', note: 'для начинающего' },
-    { id: 'ex-l10', category: 'love', title: '10 дней без соцсетей', note: 'с близким человеком' },
-
-    { id: 'ex-c1', category: 'creativity', title: 'Написать книгу', note: 'своя история' },
-    { id: 'ex-c2', category: 'creativity', title: 'Снять короткометражку', note: '10 минут' },
-    { id: 'ex-c3', category: 'creativity', title: 'Выставка фотографий', note: 'свои лучшие кадры' },
-    { id: 'ex-c4', category: 'creativity', title: 'Научиться играть на инструменте', note: 'одна песня целиком' },
-    { id: 'ex-c5', category: 'creativity', title: 'Библиотека из 100 книг', note: 'свои, не случайные' },
-    { id: 'ex-c6', category: 'creativity', title: 'Дом у моря с мастерской', note: 'место для работы' },
-    { id: 'ex-c7', category: 'creativity', title: 'Кухня с большим столом', note: 'собираются все' },
-    { id: 'ex-c8', category: 'creativity', title: 'Посадить дерево или парк', note: 'оставить след' },
-    { id: 'ex-c9', category: 'creativity', title: 'Оплатить обучение 3 детям', note: 'не своим' },
-    { id: 'ex-c10', category: 'creativity', title: 'Годовой ритуал помощи', note: 'станет традицией' }
-  ];
-
-  const EXAMPLE_IMAGES = {
-    travel: ['scene-ski.jpg', 'scene-egypt.jpg', 'scene-turkey.jpg', 'scene-vietnam.jpg', 'scene-yacht.jpg'],
-    body: ['scene-dolzhanka.jpg', 'scene-ski.jpg', 'scene-pyatigorsk.jpg', 'scene-yacht.jpg', 'scene-vietnam.jpg'],
-    business: ['scene-business.jpg', 'scene-income.jpg'],
-    love: ['scene-love.jpg', 'scene-yacht.jpg'],
-    creativity: ['scene-vietnam.jpg', 'scene-yacht.jpg', 'scene-business.jpg', 'scene-love.jpg']
-  };
-
+  const EXAMPLES = window.WISH_EXAMPLES || [];
+  const EXAMPLE_IMAGES = window.WISH_EXAMPLE_IMAGES || {};
   const BASE_BY_ID = Object.fromEntries(SEED.map((wish) => [wish.id, wish]));
 
   const state = {
@@ -1634,6 +1572,36 @@
   window.addEventListener('resize', sizeCanvas);
   sizeCanvas();
 
+  function consumeExampleInbox() {
+    if (state.shared) return;
+    let ids = [];
+    try {
+      ids = JSON.parse(localStorage.getItem(EXAMPLE_INBOX_KEY) || '[]');
+    } catch {
+      return;
+    }
+    if (!Array.isArray(ids) || !ids.length) return;
+    let added = 0;
+    ids.forEach((id) => {
+      const example = EXAMPLES.find((item) => item.id === id);
+      if (!example) return;
+      if (state.wishes.some((wish) => wish.title === example.title)) return;
+      state.wishes.push({
+        id: uid(),
+        title: example.title,
+        note: example.note,
+        month: 'Когда-нибудь',
+        category: example.category,
+        image: exampleImage(example),
+        done: false
+      });
+      added += 1;
+    });
+    if (added) saveLocal();
+    try { localStorage.removeItem(EXAMPLE_INBOX_KEY); } catch {}
+    if (added) showToast(`Добавлено из примеров: ${added}`);
+  }
+
   /* ---------- init ---------- */
   const sharedWishes = readSharedPayload();
   if (sharedWishes) {
@@ -1644,6 +1612,7 @@
     if (els.progressSub) els.progressSub.textContent = 'Так выглядит карта Виктора.';
   } else {
     state.wishes = loadLocal();
+    consumeExampleInbox();
   }
   renderWishes();
   renderExamples();

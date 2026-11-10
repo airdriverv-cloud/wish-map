@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ru" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>50 желаний для вдохновения — Карта желаний</title>
+<meta name="description" content="50 готовых желаний по типам: путешествия, тело, дело, любовь, творчество. Добавляй в свою карту одной кнопкой.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0b1c18">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/CormorantGaramond-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/Manrope-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css?v=24">
+<link rel="stylesheet" href="app.css?v=36">
+<link rel="stylesheet" href="examples-page.css?v=2">
+<script>document.documentElement.classList.replace('no-js','js');</script>
+</head>
+<body class="examples-page">
+<div class="page-bg" aria-hidden="true"></div>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="index.html" aria-label="На главную">
+      <span class="brand-mark">V</span>
+      <span class="brand-text">Карта<br>желаний</span>
+    </a>
+    <nav class="nav" aria-label="Основная навигация">
+      <a href="index.html#wishes">Желания</a>
+      <a class="is-active" href="examples.html">Примеры</a>
+      <a href="index.html#route">Маршрут</a>
+      <a href="index.html#video-map">Видео</a>
+    </nav>
+    <div class="header-actions">
+      <a class="btn btn-small btn-share" href="index.html">← К карте</a>
+    </div>
+  </div>
+</header>
+
+<main class="examples-main">
+  <section class="examples-hero">
+    <div class="container">
+      <p class="eyebrow reveal">Отдельный лист · 50 идей</p>
+      <div class="examples-hero-grid">
+        <h1 class="reveal">50 желаний.<br><em>Для вдохновения.</em></h1>
+        <p class="section-note reveal">Готовые идеи по типам. Нажми «В мою карту» — желание появится в твоей карте с категорией и картинкой.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="examples-sheet">
+    <div class="container">
+      <div class="examples-toolbar">
+        <div class="example-filters" role="group" aria-label="Тип примеров">
+          <button class="example-filter is-active" type="button" data-example-filter="all">Все <span>50</span></button>
+          <button class="example-filter" type="button" data-example-filter="travel">Путешествия</button>
+          <button class="example-filter" type="button" data-example-filter="body">Тело</button>
+          <button class="example-filter" type="button" data-example-filter="business">Дело</button>
+          <button class="example-filter" type="button" data-example-filter="love">Любовь</button>
+          <button class="example-filter" type="button" data-example-filter="creativity">Творчество</button>
+        </div>
+        <div class="examples-view" role="group" aria-label="Вид примеров">
+          <span class="examples-view-label">Вид</span>
+          <button class="view-tab" type="button" data-cols="2">2 столбика</button>
+          <button class="view-tab" type="button" data-cols="4">4 столбика</button>
+          <button class="view-tab is-active" type="button" data-cols="5">Как сейчас</button>
+        </div>
+      </div>
+
+      <div class="examples-sheet-foot">
+        <span id="exampleCount">50 идей</span>
+        <span>Добавленные желания сохраняются в браузере</span>
+      </div>
+
+      <div class="examples-page-grid cols-5" id="examplesPageGrid" aria-live="polite"></div>
+      <div class="examples-empty" id="examplesEmpty" hidden>Ничего не найдено.</div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
+<script src="examples-data.js?v=1"></script>
+<script src="examples-page.js?v=1" defer></script>
+</body>
+</html>
