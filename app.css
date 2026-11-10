@@ -1084,3 +1084,6 @@ button.text-link:hover { border-color: var(--gold); }
 @media (max-width: 620px) {
   .video-options { grid-template-columns: 1fr; gap: 0; }
 }
+
+.video-options.is-local .field { display: none; }
+.video-options.is-local { grid-template-columns: 1fr; }

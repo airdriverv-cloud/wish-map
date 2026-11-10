@@ -75,6 +75,16 @@ python wishmap-viktor/comfy_bridge.py
 python wishmap-viktor/fal_bridge.py
 ```
 
+### Видео на ноутбуке
+
+Режим «Ноут» умеет генерировать короткое видео локально через Wan 2.1 T2V 1.3B в ComfyUI:
+
+- 480×832, 9:16, около 2 секунд, без звука;
+- занимает примерно 3–4 минуты на RTX 3060 Laptop;
+- файл лежит в `wishmap-viktor/video_out/` и отдаётся мостом по `/video/<id>.mp4`.
+
+ComfyUI должен видеть Wan-модели из портативной сборки. Для этого в `C:\AI\ComfyUI\extra_model_paths.yaml` добавлен путь к `ai/ComfyUI_windows_portable/ComfyUI`. После изменения конфига ComfyUI перезапускается.
+
 ### Ноут из интернета
 
 Мост ComfyUI уже защищён PIN-кодом `6620` и лимитом запросов. Чтобы открыть его наружу, один раз включите Tailscale Funnel для узла и запустите:

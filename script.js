@@ -684,6 +684,10 @@
 
   function updateVideoCost() {
     if (!els.videoCost) return;
+    if (imageMethod === 'local') {
+      els.videoCost.textContent = 'Локально на ноутбуке · около 2 секунд · без оплаты';
+      return;
+    }
     const duration = Number(els.videoDuration?.value) || 6;
     els.videoCost.textContent = `≈ ${formatUsd(duration * FAL_VIDEO_COST_PER_SECOND)} · ${duration} секунд`;
   }
@@ -742,8 +746,9 @@
     if (els.videoOptions) els.videoOptions.hidden = imageMode !== 'video';
     if (imageMode === 'video') {
       if (els.imageCount) els.imageCount.value = '1';
+      if (imageMethod === 'find') setImageMethod('local');
+      if (els.videoOptions) els.videoOptions.classList.toggle('is-local', imageMethod === 'local');
       updateVideoCost();
-      setImageMethod('fal');
     }
     updateGenerateButton();
   }
@@ -777,6 +782,8 @@
     if (els.falPinPanel) els.falPinPanel.hidden = true;
     if (els.falBalance) els.falBalance.hidden = method !== 'fal';
     if (method === 'fal') loadFalBalance();
+    if (els.videoOptions && imageMode === 'video') els.videoOptions.classList.toggle('is-local', method === 'local');
+    if (imageMode === 'video') updateVideoCost();
     updateGenerateButton();
     saveImageDraft();
   }
@@ -1062,6 +1069,43 @@
     }
   }
 
+  async function pollComfyVideoJob(base, jobId, headers, signal) {
+    while (true) {
+      await new Promise((resolve) => window.setTimeout(resolve, 5000));
+      const poll = await fetch(`${base}/status/${jobId}`, { headers, signal });
+      if (!poll.ok) throw new Error('video status ' + poll.status);
+      const state = await poll.json();
+      if (state.status === 'done' && state.url) return state.url;
+      if (state.status === 'error') throw new Error(state.error || 'video error');
+    }
+  }
+
+  async function startComfyVideo(base, prompt, seed, timeout = 420000) {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), timeout);
+    const headers = { 'Content-Type': 'application/json', 'X-Wishmap-Pin': REMOTE_COMFY_PIN };
+    try {
+      const response = await fetch(`${base}/generate-video`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ prompt, seed }),
+        signal: controller.signal
+      });
+      if (!response.ok) throw new Error('video start ' + response.status);
+      const started = await response.json();
+      if (started?.url) return started.url;
+      if (!started?.job_id) throw new Error('video no job');
+      return await pollComfyVideoJob(base, started.job_id, headers, controller.signal);
+    } finally {
+      window.clearTimeout(timer);
+    }
+  }
+
+  async function localVideoGenerate(prompt, seed) {
+    const url = await startComfyVideo('http://127.0.0.1:8190', prompt, seed);
+    return { url, via: 'local' };
+  }
+
   async function remoteGenerate(prompt, seed) {
     return startComfy(
       REMOTE_COMFY_URL,
@@ -1115,45 +1159,63 @@
       els.imagePrompt?.focus();
       return;
     }
-    if (!falUnlocked) {
+    if (imageMethod === 'fal' && !falUnlocked) {
       setImageMethod('fal');
+      return;
+    }
+    if (imageMethod === 'find') {
+      showToast('Для видео выбери «Ноут» или FAL');
       return;
     }
     const wish = state.wishes.find((item) => item.id === imageWishId);
     if (!wish) return;
     const details = els.imageDetails?.value.trim() || '';
     const duration = Number(els.videoDuration?.value) || 6;
-    setGenerateBusy(true, 'FAL генерирует видео…');
+    const local = imageMethod === 'local';
+    setGenerateBusy(true, local ? 'Ноут генерирует видео…' : 'FAL генерирует видео…');
     if (els.imageStatus) {
-      els.imageStatus.textContent = 'Генерирую видео. Это может занять минуту…';
+      els.imageStatus.textContent = local
+        ? 'Локальный Wan рендерит видео. Это занимает несколько минут…'
+        : 'Генерирую видео. Это может занять минуту…';
       els.imageStatus.classList.remove('is-error');
     }
     try {
       const english = await translateToEnglish([prompt, details].filter(Boolean).join('. '));
       const videoPrompt = [english, 'cinematic vertical 9:16 video, natural motion, no text, no watermark']
         .filter(Boolean).join('. ');
-      const response = await fetch('http://127.0.0.1:8189/generate-video', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin: FAL_PIN, prompt: videoPrompt, duration })
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok || !data.url) throw new Error(data.error || 'video error');
-      wish.video = data.url;
+      let videoUrl = '';
+      if (local) {
+        const result = await localVideoGenerate(videoPrompt, Math.floor(Math.random() * 2_000_000_000));
+        videoUrl = result.url;
+      } else {
+        const response = await fetch('http://127.0.0.1:8189/generate-video', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin: FAL_PIN, prompt: videoPrompt, duration })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.url) throw new Error(data.error || 'video error');
+        videoUrl = data.url;
+      }
+      wish.video = videoUrl;
       wish.videoPrompt = prompt;
-      falUnlocked = false;
-      if (els.falPinPanel) els.falPinPanel.hidden = true;
+      if (!local) {
+        falUnlocked = false;
+        if (els.falPinPanel) els.falPinPanel.hidden = true;
+      }
       saveLocal();
       renderWishes();
       renderVideoResult();
       if (els.imageStatus) {
-        els.imageStatus.textContent = `Видео готово · ${duration} секунд.`;
+        els.imageStatus.textContent = local
+          ? 'Локальное видео готово · около 2 секунд.'
+          : `Видео готово · ${duration} секунд.`;
         els.imageStatus.classList.remove('is-error');
       }
-      showToast('Видео добавлено в карточку');
+      showToast(local ? 'Видео сгенерировано на ноутбуке' : 'Видео добавлено в карточку');
     } catch (error) {
       if (els.imageStatus) {
-        els.imageStatus.textContent = 'Видео не получилось: ' + (error.message || 'ошибка FAL');
+        els.imageStatus.textContent = 'Видео не получилось: ' + (error.message || 'ошибка');
         els.imageStatus.classList.add('is-error');
       }
       showToast('Видео не сгенерировалось');
@@ -1762,8 +1824,8 @@
   });
   $$('.image-method').forEach((button) => {
     button.addEventListener('click', () => {
-      if (imageMode === 'video' && button.dataset.imageMethod !== 'fal') {
-        showToast('Для видео используется FAL');
+      if (imageMode === 'video' && button.dataset.imageMethod === 'find') {
+        showToast('Для видео выбери «Ноут» или FAL');
         return;
       }
       setImageMethod(button.dataset.imageMethod);
