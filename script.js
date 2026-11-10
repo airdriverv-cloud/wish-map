@@ -858,12 +858,11 @@
     }
   }
 
-  async function findCommonsImage(query) {
-    const search = await translateToEnglish(query);
+  async function searchCommons(text) {
     const params = new URLSearchParams({
       action: 'query',
       generator: 'search',
-      gsrsearch: `${search} filetype:bitmap`,
+      gsrsearch: `${text} filetype:bitmap`,
       gsrnamespace: '6',
       gsrlimit: '12',
       prop: 'imageinfo',
@@ -876,8 +875,8 @@
     if (!response.ok) throw new Error('commons');
     const data = await response.json();
     const pages = data?.query?.pages;
-    if (!pages) throw new Error('no pages');
-    const candidates = Object.values(pages)
+    if (!pages) return [];
+    return Object.values(pages)
       .map((page) => {
         const info = page?.imageinfo?.[0];
         return {
@@ -888,10 +887,26 @@
         };
       })
       .filter((item) => item.url && !/(stamp|logo|map|diagram|poster|cover|plaque|sign)/i.test(item.title));
-    if (!candidates.length) throw new Error('no candidates');
-    const portrait = candidates.filter((item) => item.height >= item.width * 1.05);
-    const pool = portrait.length ? portrait : candidates;
-    return pool[Math.floor(Math.random() * Math.min(pool.length, 6))].url;
+  }
+
+  async function findCommonsImage(query) {
+    const english = await translateToEnglish(query);
+    const words = english.replace(/[^\p{L}\s]/gu, ' ').split(/\s+/).filter((word) => word.length > 3);
+    const queries = [...new Set([
+      english,
+      words.slice(0, 5).join(' '),
+      words.slice(0, 3).join(' '),
+      query
+    ].map((item) => item.trim()).filter(Boolean))];
+
+    for (const text of queries) {
+      const candidates = await searchCommons(text);
+      if (!candidates.length) continue;
+      const portrait = candidates.filter((item) => item.height >= item.width * 1.05);
+      const pool = portrait.length ? portrait : candidates;
+      return pool[Math.floor(Math.random() * Math.min(pool.length, 6))].url;
+    }
+    throw new Error('nothing found in internet');
   }
 
   function fallbackImage(wish) {
@@ -1083,12 +1098,13 @@
     }
 
     if (!imageUrl) {
+      const query = [prompt, details].filter(Boolean).join(' ') || wish.title;
       try {
-        const query = [prompt, details].filter(Boolean).join(' ') || wish.title;
         imageUrl = await findCommonsImage(query);
         await loadImage(imageUrl);
         used = 'photo';
       } catch {
+        if (imageMethod === 'find') throw new Error('nothing found in internet');
         imageUrl = fallbackImage(wish);
         used = 'fallback';
       }
