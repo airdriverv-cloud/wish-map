@@ -47,6 +47,8 @@
   let toastTimer = null;
   let lastFocused = null;
   let imageWishId = null;
+  let deleteArmed = false;
+  let deleteTimer = null;
   let imageMethod = 'find';
   let imageStyle = 'cartoon';
   const FAL_PIN = '6620';
@@ -354,11 +356,22 @@
     }
   }
 
+  function resetDeleteButton() {
+    deleteArmed = false;
+    if (deleteTimer) window.clearTimeout(deleteTimer);
+    deleteTimer = null;
+    if (els.deleteWish) {
+      els.deleteWish.textContent = 'Удалить';
+      els.deleteWish.classList.remove('is-armed');
+    }
+  }
+
   function openWishModal(mode, id = null) {
     if (state.shared) {
       showToast('Это просмотр. Забери карту себе, чтобы менять её.');
       return;
     }
+    resetDeleteButton();
     state.editingId = mode === 'edit' ? id : null;
     const wish = state.editingId ? state.wishes.find((item) => item.id === id) : null;
     if (els.wishModalKicker) els.wishModalKicker.textContent = mode === 'edit' ? 'Редактировать' : 'Новое желание';
@@ -405,7 +418,18 @@
     if (!state.editingId || state.shared) return;
     const wish = state.wishes.find((item) => item.id === state.editingId);
     if (!wish) return;
-    if (!window.confirm(`Удалить «${wish.title}»?`)) return;
+    if (!deleteArmed) {
+      deleteArmed = true;
+      if (els.deleteWish) {
+        els.deleteWish.textContent = 'Удалить?';
+        els.deleteWish.classList.add('is-armed');
+      }
+      if (deleteTimer) window.clearTimeout(deleteTimer);
+      deleteTimer = window.setTimeout(resetDeleteButton, 4000);
+      showToast('Нажми «Удалить?» ещё раз');
+      return;
+    }
+    resetDeleteButton();
     state.wishes = state.wishes.filter((item) => item.id !== state.editingId);
     saveLocal();
     closeModal(els.wishModal);

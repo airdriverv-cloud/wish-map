@@ -682,3 +682,5 @@ button.text-link:hover { border-color: var(--gold); }
   .image-style { padding: 9px 8px; }
   .image-style b { font-size: 19px; }
 }
+
+.text-link.is-armed { color: #ff9a85; }
